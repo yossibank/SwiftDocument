@@ -58,7 +58,7 @@
 このモジュールを組み合わせる事で、より単純に大きな問題を解決できるようにしていきます。これがソフトウェア設計の根幹にある考え方でもあります。
 
 <図1>  
-<img src=https://user-images.githubusercontent.com/55877379/148474421-5cdcc5a6-db0b-4079-8fbc-841ec5c7fbd2.png  width=50%>
+<img src="img/before-separation-of-responsibility.png" width=50%>  
 
 <図2>  
 <img src=https://user-images.githubusercontent.com/55877379/148474428-3e2d9de2-e292-45a9-8137-893c740546d7.png  width=50%>
