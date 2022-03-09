@@ -1,37 +1,96 @@
-# 概要
-アプリにおいて画面遷移の機能は必須の機能とも言えます。  
-しかし、必須であるがゆえにどの画面においても画面遷移の処理を書く必要があり、その責務は一般的にView Controllerが受け持ちます。  
-画面遷移したい場合にはView Controller内で次のView Controllerをインスタンス化し、Navigation ControllerへのpushやModalのpresentを行うのが一般的です。
+# Coordinatorパターン
+
+## 概要
+画面遷移の処理は一般的にViewControllerが受け持ちます。
+画面遷移したい場合にはViewController内で次のViewControllerをインスタンス化し、NavigationControllerへのpushやModalのpresentを行うのが一般的です。
+例えば、以下のような方法で画面遷移を行う場合があります。
 
 ```swift
-extension ViewController: UICollectionViewDelegate {
-    func collectionView(
-        _ collectionView: UICollectionView,
-        didSelectItemAt indexPath: IndexPath
-    ) {
-        /* 次のViewControllerに必要なデータ抽出 */
-        let object = objects[indexPath.item]
+final class MainViewController: UIViewController {
+
+    private let modalButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("MODAL", for: .normal)
+        button.backgroundColor = .blue
+        return button
+    }()
+    
+    private let pushButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("PUSH", for: .normal)
+        button.backgroundColor = .green
+        return button
+    }()
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupView()
+        setEvent()
+    }
+
+    private func setupView() {
+        view.backgroundColor = .systemBackground
+
+        title = "MAIN"
+
+        view.addSubview(modalButton)
+        view.addSubview(pushButton)
+
+        modalButton.translatesAutoresizingMaskIntoConstraints = false
+        pushButton.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            modalButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            modalButton.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            pushButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            pushButton.topAnchor.constraint(equalTo: modalButton.bottomAnchor, constant: 20)
+        ])
+    }
+
+    private func setEvent() {
+        modalButton.addTarget(
+            self,
+            action: #selector(tappedModalButton),
+            for: .touchUpInside
+        )
+
+        pushButton.addTarget(
+            self,
+            action: #selector(tappedPushButton),
+            for: .touchUpInside
+        )
+    }
+
+    @objc private func tappedModalButton() {
         /* 次のViewControllerのインスタンス作成 */
-        let nextVC = NextViewController(object: object)
-        /* Navigation Controllerへのpush処理を実行 */
+        let nextVC = NextViewController()
+        /* present(_:animated:)を使用してモーダル表示の処理を実行 */
+        present(nextVC, animated: true)
+    }
+
+    @objc private func tappedPushButton() {
+        /* 次のViewControllerのインスタンス作成 */
+        let nextVC = NextViewController()
+        /* UINavigationControllerのpushViewController(_:animated:)を使用してpush処理を実行 */
         navigationController?.pushViewController(nextVC, animated: true)
     }
 }
 ```
 
-しかし裏を返すと、View Controllerは次のView Controllerのことを知っていることになります。  
-遷移元のView Controllerと遷移先のView Controllerの関係が1対1である場合には大した問題にはなりません。  
-ですがそのView Controllerを使い回したり、遷移先が複数存在するような場合、遷移先が特定のView Controllerに依存していることで、遷移ロジックが肥大化します。  
-これを解決するためにView Controllerの上位レイヤーとして、画面遷移を管理するCoordinatorというものが生まれました。
+しかし裏を返すと、ViewControllerは次のViewControllerのことを知っていることになります。  
+上記でいうところの`MainViewController`が`NextViewController`を知る必要があるということです。  
+遷移元のViewControllerと遷移先のViewControllerの関係が1対1である場合には大した問題にはなりません。  
+ですがそのViewControllerを使い回したり、遷移先が複数存在するような場合、遷移先が特定のViewControllerに依存していることで、遷移ロジックが肥大化します。  
+これを解決するためにViewControllerの上位レイヤーとして、画面遷移を管理するCoordinatorというものが生まれました。
 
 ## Application Coordinator
 Coordinatorを導入する場合、アプリ全体を管轄する責務を持ったCoordinatorが1つ必要です。  
 これを`Application Coordinator`と呼びます。  
-Application CoordinatorはAppDelegateが所有し、ルートビューに対するCoordinatorとなります。  
-Application Coordinatorをルートとして、1つのView Controllerにつき1つのCoordinatorが存在します。そして画面遷移の経路に沿った親子関係を構築します。  
+`Application Coordinator`はAppDelegateが所有し、ルートビューに対するCoordinatorとなります。  
+`Application Coordinator`をルートとして、1つのViewControllerにつき1つのCoordinatorが存在します。そして画面遷移の経路に沿った親子関係を構築します。  
 
-例えばTab Barをルートとするアプリでは、それぞれのTab Bar Itemで、対応するNavigationController毎に1つのCoordinatorが存在し、それをタブ全体のCoordinatorが親として持つことになります。  
-Application Coordinatorは`Application Controller`とも呼ばれており設計パターンの1つでもあります。
+例えばTabBarをルートとするアプリでは、それぞれのTabBarItemで、対応するNavigationController毎に1つのCoordinatorが存在し、それをタブ全体のCoordinatorが親として持つことになります。  
+`Application Coordinator`は`Application Controller`とも呼ばれており設計パターンの1つでもあります。
 
 ### Application Coordinatorの実装
 ```swift
