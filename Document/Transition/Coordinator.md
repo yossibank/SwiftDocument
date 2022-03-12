@@ -1,8 +1,8 @@
 # Coordinatorパターン
 
 ## 概要
-画面遷移の処理は一般的にViewControllerが受け持ちます。
-画面遷移したい場合にはViewController内で次のViewControllerをインスタンス化し、NavigationControllerへのpushやModalのpresentを行うのが一般的です。
+画面遷移の処理は一般的にViewControllerが受け持ちます。  
+画面遷移したい場合にはViewController内で次のViewControllerをインスタンス化し、NavigationControllerへのpushやModalのpresentを行うのが一般的です。  
 例えば、以下のような方法で画面遷移を行う場合があります。
 
 ```swift
@@ -92,6 +92,8 @@ Coordinatorを導入する場合、アプリ全体を管轄する責務を持っ
 例えばTabBarをルートとするアプリでは、それぞれのTabBarItemで、対応するNavigationController毎に1つのCoordinatorが存在し、それをタブ全体のCoordinatorが親として持つことになります。  
 `Application Coordinator`は`Application Controller`とも呼ばれており設計パターンの1つでもあります。
 
+<-- 画像挿入 -->
+
 ### Application Coordinatorの実装
 ```swift
 /** Coordinator.swift
@@ -101,39 +103,14 @@ protocol Coordinator {
     func start()
 }
 
-/** AppCoordinator.swift
- * AppCoordinatorの作成
- */
-final class AppCoordinator: Coordinator {
-    private let window: UIWindow
-    private let rootViewController: UITabBarController
-    private var repoListCoordinator: RepoListCoordinator
-
-    init(window: UIWindow) {
-        self.window = window
-        self.rootViewController = .init()
-
-        let repoNavigationController = UINavigationController()
-        self.repoListCoordinator = RepoListCoordinator(navigator: repoNavigationController)
-
-        rootViewController.viewControllers = [repoNavigationController]
-    }
-
-    func start() {
-        window.rootViewController = rootViewController
-        repoListCoordinator.start()
-        window.makeKeyAndVisible()
-    }
-}
-
 /** AppDelegate.swift
  * AppCoordinatorの初期化
  */
-final class AppDelegate: UIResponder, UIApplicationDelegate {
-
+@main
+class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
-    private var appCoordinator: AppCoordinator?
+    private var appCoordinator: AppCooridnator?
 
     func application(
         _ application: UIApplication,
@@ -142,164 +119,222 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         let window = UIWindow(frame: UIScreen.main.bounds)
         self.window = window
 
-        /* AppDelegate自身がどこに画面遷移をするのかを知る必要がなくなる */
-        let appCoordinator = AppCoordinator(window: window)
+        let appCoordinator = AppCooridnator(window: window)
         appCoordinator.start()
         self.appCoordinator = appCoordinator
 
         return true
     }
 }
+
+/** AppCoordinator.swift
+ * AppCoordinatorの作成
+ */
+final class AppCooridnator: Coordinator {
+    private let window: UIWindow
+    private let rootViewController: UITabBarController = .init()
+    private var mainCoordinator: MainCoordinator?
+
+    init(window: UIWindow) {
+        self.window = window)
+        self.mainCoordinator = MainCoordinator(tabController: self.rootViewController)
+    }
+
+    func start() {
+        window.rootViewController = rootViewController
+        mainCoordinator?.start()
+        window.makeKeyAndVisible()
+    }
+}
+
+/** MainCoordinator.swift
+ * タブ全体を管理するCoordinatorの作成
+ */
+final class MainCoordinator: Coordinator {
+    private let tabController: UITabBarController
+    private var firstCoordinator: FirstCoordinator?
+    private var secondCoordinator: SecondCoordinator?
+    private var thirdCoordinator: ThirdCoordinator?
+
+    init(tabController: UITabBarController) {
+        self.tabController = tabController
+
+        let firstNav = UINavigationController()
+        self.firstCoordinator = FirstCoordinator(navigationController: firstNav)
+
+        let secondNav = UINavigationController()
+        self.secondCoordinator = SecondCoordinator(navigationController: secondNav)
+
+        let thirdNav = UINavigationController()
+        self.thirdCoordinator = ThirdCoordinator(navigationController: thirdNav)
+
+        tabController.setViewControllers(
+            [firstNav, secondNav, thirdNav],
+            animated: false
+        )
+    }
+
+    func start() {
+        firstCoordinator?.start()
+        secondCoordinator?.start()
+        thirdCoordinator?.start()
+    }
+}
 ```
 
 ### Coordinatorによる画面遷移
 ```swift
-/**
- * 起動するとTable Viewが表示されて、セルをタップすると詳細画面に遷移するサンプルアプリを作ってみる
+/** FirstCoordinator.swift
+ * Coordinatorの作成
  */
+final class FirstCoordinator: Coordinator {
+    private let navigationController: UINavigationController
+    private var firstViewController: FirstViewController?
+    private var firstDetailCoordinator: FirstDetailCoordinator?
 
-/** RepoListCoordinator.swift
- * メイン画面のCoordinatorの作成
- */
-final class RepoListCoordinator: Coordinator {
-    /**
-      * Navigation Controllerを必要とする
-      * Navigation Controllerを保持することで実際の繊維処理を受け持つ
-      */
-    private let navigator: UINavigationController
-    private var repoListViewController: RepoListViewController?
-
-    init(navigator: UINavigationController) {
-        self.navigator = navigator
+    init(navigationController: UINavigationController) {
+        self.navigationController = navigationController
     }
 
-    /* RepoListCoordinatorに対応するView ControllerであるRepoListViewControllerが表示される */
     func start() {
-        let viewController = RepoListViewController()
-        viewController.delegate = self
-        navigator.pushViewController(viewController, animated: true)
-        self.repoListViewController = repoListViewController
+        let firstVC = FirstViewController()
+        firstVC.delegate = self
+        firstVC.title = "FIRST"
+        navigationController.pushViewController(firstVC, animated: true)
+        firstViewController = firstVC
     }
 }
 
-extension RepoListCoordinator: RepoListViewControllerDelegate {
-
-    func repoListViewControllerDidSelectRepo(_ repo: String) {
-        /* 次の画面のCoordinatorを作成、保持 */
-        let repoDetailCoordinator = RepoDetailCoordinator(
-            navigator: navigator,
-            repo: repo
+extension FirstCoordinator: FirstViewControllerDelegate {
+    
+    func FirstViewControllerDidSelectName(_ name: String) {
+        let firstDetailCoordinator = FirstDetailCoordinator(
+            navigationController: navigationController,
+            name: name
         )
-        /* Navigation Controllerのpushの処理などは入れない */
-        repoDetailCoordinator.start()
-        self.repoDetailCoordinator = repoDetailCoordinator
+        firstDetailCoordinator.start()
+        self.firstDetailCoordinator = firstDetailCoordinator
     }
 }
 
-/** RepoListViewController.swift
- * メイン画面のViewControllerの作成
+/** FirstViewController.swift
+ * ViewControllerの作成
  */
-protocol RepoListViewControllerDelegate: AnyObject {
-    func repoListViewControllerDidSelectRepo(_ repo: String)
+protocol FirstViewControllerDelegate: AnyObject {
+    func FirstViewControllerDidSelectName(_ name: String)
 }
 
-final class RepoListViewController: UIViewController {
-    weak var delegate: RepoListViewControllerDelegate?
+final class FirstViewController: UIViewController {
+    var names: [String] = ["name1", "name2", "name3", "name4", "name5"]
 
-    private let repoList: [String] = ["repo1", "repo2", "repo3", "repo4", "repo5"]
-    private let tableView: UITableView = .init()
+    weak var delegate: FirstViewControllerDelegate?
+
+    private lazy var tableView: UITableView = {
+        let tableView = UITableView()
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        return tableView
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupView()
+    }
 
+    private func setupView() {
+        view.backgroundColor = .systemBackground
         view.addSubview(tableView)
 
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activates([
+        NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.topAnchor),
-            talbeView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            talbeView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
-
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
-        tableView.dataSource = self
-        talbeView.delegate = self
     }
 }
 
-extension RepoListViewController: UITableViewDataSource {
+extension FirstViewController: UITableViewDelegate {
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
 
-    func tableView(_ tableView: UITableView, numberOfRowsInSection: Int) -> Int {
-        repoList.count
+        let name = names[indexPath.row]
+        delegate?.FirstViewControllerDidSelectName(name)
+    }
+}
+
+extension FirstViewController: UITableViewDataSource {
+    func tableView(
+        _ tableView: UITableView,
+        numberOfRowsInSection section: Int
+    ) -> Int {
+        names.count
     }
 
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell"), for: indexPath)
-        cell.textLabel?.text = repoList[indexPath.row]
+    func tableView(
+        _ tableView: UITableView,
+        cellForRowAt indexPath: IndexPath
+    ) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        cell.textLabel?.text = names[indexPath.row]
         return cell
     }
 }
 
-extension RepoListViewController: UITableViewDelegate {
-
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: false)
-
-        let repo = repoList[indexPath.row]
-        /* delegateに画面遷移の処理を移譲 */
-        delegate?.repoListViewControllerDidSelectRepo(repo)
-    }
-}
-
-/** RepoDetailCoordinator.swift
- * 詳細画面のCoordinatorの作成
+/** FirstDetailCoordinator.swift
+ * Coordinatorの作成
  */
-final class RepoDetailCoordinator: Coordinator {
-    /* 初期化時にNavigation Controllerを必要とする */
-    private let navigator: UINavigationController
-    /* 画面で使用する必須パラメータを保持 */
-    private let repo: String
-    private var repoDetailViewController: RepoDetailViewController?
+final class FirstDetailCoordinator: Coordinator {
+    private let navigationController: UINavigationController
+    private let name: String
+    private var firstDetailViewController: FirstDetailViewController?
 
-    init(navigator: UINavigationController, repo: String) {
-        self.navigator = navigator
-        self.repo = repo
+    init(navigationController: UINavigationController, name: String) {
+        self.navigationController = navigationController
+        self.name = name
     }
 
-    /* RepoDetailCoordinatorに対応するView ControllerであるRepoDetailViewControllerが表示される */
     func start() {
-        let viewController = RepoDetailViewController()
-        viewController.repo = repo
-        self.navigator.pushViewController(viewController, animated: true)
-        self.repoDetailViewController = viewController
+        let firstDetailVC = FirstDetailViewController()
+        firstDetailVC.name = name
+        firstDetailVC.title = "FIRST DETAIL"
+        navigationController.pushViewController(firstDetailVC, animated: true)
+        self.firstDetailViewController = firstDetailVC
     }
 }
 
-/** RepoDetailViewController.swift
- * 詳細画面のViewControllerの作成
+/** FirstDetailViewController.swift
+ * ViewControllerの作成
  */
-final class RepoDetailViewController: UIViewController {
+final class FirstDetailViewController: UIViewController {
+    var name: String?
 
-    var repo: String?
-
-    private let label: UILabel = .init()
+    private lazy var label: UILabel = {
+        let label = UILabel()
+        label.textColor = .red
+        label.font = .boldSystemFont(ofSize: 20)
+        label.text = name
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupView()
+    }
 
+    private func setupView() {
+        view.backgroundColor = .systemBackground
         view.addSubview(label)
-        view.backGroundColor = .white
 
-        label.translatesAutoResizingMaskInfoConstraints = false
-        NSLayoutConstraint.activates([
+        NSLayoutConstraint.activate([
             label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             label.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            label.widthAnchor.constraint(equalToConstant: 200),
             label.heightAnchor.constraint(equalToConstant: 40)
         ])
-
-        label.text = repo
     }
 }
 ```
