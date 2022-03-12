@@ -92,7 +92,7 @@ Coordinatorを導入する場合、アプリ全体を管轄する責務を持っ
 例えばTabBarをルートとするアプリでは、それぞれのTabBarItemで、対応するNavigationController毎に1つのCoordinatorが存在し、それをタブ全体のCoordinatorが親として持つことになります。  
 `Application Coordinator`は`Application Controller`とも呼ばれており設計パターンの1つでもあります。
 
-<-- 画像挿入 -->
+<img src="img/coordinator.png" width=50%>
 
 ### Application Coordinatorの実装
 ```swift
