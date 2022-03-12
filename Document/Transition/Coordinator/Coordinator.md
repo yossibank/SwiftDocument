@@ -359,53 +359,41 @@ final class FirstDetailViewController: UIViewController {
   - application:continueUserActivity
   - application:performActionForShortcutItem
 
-それぞれのパターンをAppDelegateだけで対処しようとすると、それぞれのメソッドでView Controllerを初期化することになり、AppDelegateがあっという間に肥大化してしまいます。  
+それぞれのパターンをAppDelegateだけで対処しようとすると、それぞれのメソッドでViewControllerを初期化することになり、AppDelegateがあっという間に肥大化してしまいます。  
 そこでCoordinatorパターンを用いることで、起動時に何がパラメータとして渡されるか、パラメータに応じてどこに遷移するかをCoordinatorに閉じ込めることができます。またそれぞれの動作をユニットテストで担保できます。
 
 #### 通常起動
 ホーム画面でアプリをタップして起動する、いわゆる普通の起動。  
 AppDelegateの`didFinishLaunchingWithOptions`内で、UIApplication.LaunchOptionsKeyによって流入元を区別できます。
 
-#### ローカル / リモートプッシュ通知による起動
-ローカル / リモートプッシュ通知はUNUserNotificationCenterDelegateの`userNotificationCenter(_:didReceive:withCompltionHandler:)`に委ねます。
+#### ローカル/リモートプッシュ通知による起動
+ローカル/リモートプッシュ通知はUNUserNotificationCenterDelegateの`userNotificationCenter(_:didReceive:withCompltionHandler:)`に委ねます。
 
 ```swift
-extension AppDelegate: UNUserNotificationCenterDelegate {
-
-    func userNotificationCenter(
-        _ center: UNUserNotificationCenter,
-        didReceive response: UNNotificationRespose,
-        withCompletionHandler completionHandler: @escaping () -> Void
-    )
-}
-
 /** AppCoordinator.swift
- * Local NotificationとRemote Notificationはトリガによって区別する
- * そこでAppCoordinatorのイニシャライザの引数を増やす
+ * LaunchTypeの作成
  */
-final class AppCoordinator: Coordinator {
-    let window: UIWindow
-    let rootViewController: UITabBarController
-    let launchType: LaunchType
+final class AppCooridnator: Coordinator {
+    private let window: UIWindow
+    private let launchType: LaunchType?
+    private let rootViewController: UITabBarController = .init()
+    private var mainCoordinator: MainCoordinator?
 
     enum LaunchType {
         case normal
         case notification(_ notification: UNNotificationRequest)
-        case userActivity(_ userActivity: NSUserActivity)
+        case userActivity(_ active: NSUserActivity)
+        case openURL(_ url: URL)
+        case shortcutItem(_ item: UIApplicationShortcutItem)
     }
 
     init(window: UIWindow, launchType: LaunchType? = nil) {
         self.window = window
-        self.rootViewController = .init()
         self.launchType = launchType
-
-        let repoNavigationController = UINavigationController()
-        self.repoListCoordinator = RepoListCoordinator(navigator; repoNavigationController)
-
-        rootViewController.viewControllers = [repoNavigationController]
+        self.mainCoordinator = MainCoordinator(tabController: self.rootViewController)
     }
 
-    func start {
+    func start() {
         window.rootViewController = rootViewController
 
         defer {
@@ -413,7 +401,7 @@ final class AppCoordinator: Coordinator {
         }
 
         guard let launchType = launchType else {
-            repoListCoordinator.start()
+            mainCoordinator?.start()
             return
         }
 
@@ -421,27 +409,43 @@ final class AppCoordinator: Coordinator {
             case .normal:
                 break
 
-            case let .notification(request):
+            case .notification(let request):
                 if request.trigger is UNPushNotificationTrigger {
-                    /* remote notification */
-                } else if trigger is UNTimeIntervalNotificationTrigger {
-                    /* local notification */
+                    // remote notification
+                } else if request.trigger is UNTimeIntervalNotificationTrigger {
+                    // local notification
                 }
 
-            case let .userActivity(userActivity):
-                switch userActivity.activityType {
-                case NSUserActivityTypeBrowsingWeb:
-                    /* universal links */
+            case .userActivity(let active):
+                switch active.activityType {
+                    case NSUserActivityTypeBrowsingWeb:
+                        // universal links
+                        break
 
-                case CSSearchableItemActionType:
-                    /* Core spotlight */
+                    case CSSearchableItemActionType:
+                        // core spotlight
+                        break
 
-                case CSQueryContinuationActionType:
-                    /* Core spotlight (incremental search) */
+                    case CSQueryContinuationActionType:
+                        // core spotlight(incremental search)
+                        break
 
-                default:
-                    fatalError("Unreachable userActivity: `\(userActivity.activityType)`")
+                    default:
+                        fatalError("Unreachble userActivity: \(active.activityType)")
                 }
+
+            case .openURL(let url):
+                if url.scheme == "coordinator-example-widget" {
+                    let identifier = url.lastPathComponent
+                } else if url.scheme == "adjustSchemeExample" {
+                    // replace your adjust url scheme
+                } else if url.scheme == "FirebaseDynamicLinksExample" {
+                    // hadle your FDL
+                }
+
+            case .shortcutItem(let item):
+                // home screen quick action
+                break
         }
     }
 }
@@ -452,7 +456,7 @@ final class AppCoordinator: Coordinator {
 extension AppDelegate: UNUserNotificationCenterDelegate {
 
     func userNotificationCenter(
-        _ center:UNUserNotificationCenter,
+        _ center: UNUserNotificationCenter,
         didReceive response: UNNotificationResponse,
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
@@ -460,17 +464,17 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         self.window = window
 
         let request = response.notification.request
-        let launchType: AppCoordinator.LaunchType = .notification(request)
-        let appCoordinator = AppCoordinator(window: window, launchType: launchType)
-
+        let launchType = AppCooridnator.LaunchType.notification(request)
+        let appCoordinator = AppCooridnator(window: window, launchType: launchType)
         appCoordinator.start()
         self.appCoordinator = appCoordinator
+
         completionHandler()
     }
 }
 ```
 
-#### Universal Links / Core Spotlightによる起動
+#### Universal Links/Core Spotlightによる起動
 Universal LinksはWebページからのアプリ起動後に特定画面へ強制遷移できます。  
 このとき、AppDelegateの`application(_:continue:restorationHandler:)`が呼ばれます。  
 同様に、Spotlightからの検索結果やインクリメンタルサーチの表示結果からの起動でも、このデリゲートメソッドが呼ばれます。
@@ -478,16 +482,15 @@ Universal LinksはWebページからのアプリ起動後に特定画面へ強�
 ```swift
 /* AppDelegate.swift */
 func application(
-    _ application: UIapplication,
+    _ application: UIApplication,
     continue userActivity: NSUserActivity,
     restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void
 ) -> Bool {
     let window = UIWindow(frame: UIScreen.main.bounds)
     self.window = window
 
-    let type: AppCoordinator.LaunchType = .userActivity(userActivity)
-    let appCoordinator = AppCoordinator(window: window, launchType: type)
-
+    let launchType = AppCooridnator.LaunchType.userActivity(userActivity)
+    let appCoordinator = AppCooridnator(window: window, launchType: launchType)
     appCoordinator.start()
     self.appCoordinator = appCoordinator
 
@@ -497,48 +500,52 @@ func application(
 
 #### URLによる起動(Widget, Deferred Deep Link)
 Widgetからアプリを起動する場合は、Widget側でopenAppURLをコールします。  
-AdjustやFirebase Dynamic LinksなどのSDKを用いて実装する場合、通称「Deferred Deep Link」と呼ばれる仕組みのように、アプリのインストール成果とWeb広告の流入とを紐づけるため、SDKは特定のURLを自身オンactive直後に開くことがあります。
+AdjustやFirebase Dynamic LinksなどのSDKを用いて実装する場合、通称「Deferred Deep Link」と呼ばれる仕組みのように、アプリのインストール成果とWeb広告の流入とを紐づけるため、SDKは特定のURLを自身のactive直後に開くことがあります。
 
 ```swift
 /* AppDelegate.swift */
 func application(
     _ app: UIApplication,
     open url: URL,
-    options: [UIApplication.OpenURLOptionKey: Any] = [:]
+    options: [UIApplication.OpenURLOptionsKey : Any] = [:]
 ) -> Bool {
     let window = UIWindow(frame: UIScreen.main.bounds)
     self.window = window
 
-    let type: AppCoordinator.LaunchType = .openURL(url)
-    let appCoordinator = AppCoordinator(window: window, launchType: type)
-
+    let launchType = AppCooridnator.LaunchType.openURL(url)
+    let appCoordinator = AppCooridnator(window: window, launchType: launchType)
     appCoordinator.start()
     self.appCoordinator = appCoordinator
 
     return true
 }
+```
 
-/* AppCoordinator.swift */
-func start() {
-    ...
-    switch launchType {
-    ...
-        case let .openURL(url):
-            if url.scheme == "coordinator-example-widget" {
-                let identifier = url.lastPathComponent
-            } else if url.scheme == "adjustSchemeExample" {
-                /* TODO: replace your adjust url scheme */
-            } else if url.scheme == "FirebaseDynamicLinksExample" {
-                /* TODO: handle your FDL */
-            }
-    }
+#### Home Screen Quick Actionによる起動
+ホーム画面でアプリのアイコンを3Dタッチして表示されるメニューからアプリを起動する方法です。
+起動するとAppDelegateの`application(_:performActionFor:completionHandler:)`が呼ばれます。
+
+```swift
+func application(
+    _ application: UIApplication,
+    performActionFor shortcutItem: UIApplicationShortcutItem,
+    completionHandler: @escaping (Bool) -> Void
+) {
+    let window = UIWindow(frame: UIScreen.main.bounds)
+    self.window = window
+
+    let launchType = AppCooridnator.LaunchType.shortcutItem(shortcutItem)
+    let appCoordinator = AppCooridnator(window: window, launchType: launchType)
+    appCoordinator.start()
+    self.appCoordinator = appCoordinator
+
+    completionHandler(true)
 }
 ```
 
 ### 起動経路の計測と遷移先の決定
 これまでにAppCoordinatorを使って各起動経路を制御する方法を説明しましたが、AppCoordinatorの`start()`が各経路からの処理で肥大化し、かなり複雑になってしまっています。  
 そこで次の2つの責務を分離していきます
-
 1. 起動経路の計測
 2. 遷移先の決定
 
@@ -553,68 +560,66 @@ struct LaunchTracker {
         case normal
         case localNotification(identifier: String)
         case remoteNotification(identifier: String)
-        case deepLin(url: URL)
+        case deepLink(url: URL)
         case spotlight(resultIdentifier: String)
         case spotlight(query: String)
         case widget(identifier: String)
         case homeScreen(type: String)
 
-        init?(launchType: AppCoordinator.LaunchType) {
+        init?(launchType: AppCooridnator.LaunchType) {
             switch launchType {
                 case .normal:
                     self = .normal
 
-                case let .notification(request):
+                case .notification(let request):
                     if request.trigger is UNPushNotificationTrigger {
                         self = .remoteNotification(identifier: request.identifier)
                     } else if request.trigger is UNTimeIntervalNotificationTrigger {
                         self = .localNotification(identifier: request.identifier)
                     }
 
-                case let .userActivity(activity):
-                    switch activity.activityType {
+                case .userActivity(let active):
+                    switch active.activityType {
                         case NSUserActivityTypeBrowsingWeb:
-                            let url = activity.webpageURL!
-                            self = .deelLink(url: url)
+                            let url = active.webpageURL!
+                            self = .deepLink(url: url)
 
                         case CSSearchableItemActionType:
-                            let identifier = activity.userInfo![
-                                CSSearchableItemActivityIdentifier
-                            ] as! String
+                            let identifier = active.userInfo![CSSearchableItemActivityIdentifier] as! String
                             self = .spotlight(resultIdentifier: identifier)
 
                         case CSQueryContinuationActionType:
-                            let query = activity.userInfo![
-                                CSSearchQueryString
-                            ] as! String
+                            let query = active.userInfo![CSSearchQueryString] as! String
                             self = .spotlight(query: query)
 
                         default:
-                            return nil /* untracked in this app */
+                            // untracked in this app
+                            return nil
                     }
 
-                case let .openURL(url):
+                case .openURL(let url):
                     if url.scheme == "coordinator-example-widget" {
                         let identifier = url.lastPathComponent
                         self = .widget(identifier: identifier)
                     } else if url.scheme == "adjustSchemeExample" {
-                        /* TODO: replace your adjust url scheme */
+                        // replace your adjust url scheme
                         self = .deepLink(url: url)
-                    } else if url.scheme == "FirebaseDynamicLinksExample" {
-                        /* TODO: handle your FDL */
+                    } else if url.scheme == "FirebaseDynamicLinksExmaple" {
+                        // handle your FDL
                         self = .deepLink(url: url)
                     } else {
-                        return nil /* untracked any other urls */
+                        // untracked any other urls
+                        return nil
                     }
 
-                case let .shortcutItem(item):
+                case .shortcutItem(let item):
                     self = .homeScreen(type: item.type)
-            }
+                }
 
             return nil
         }
 
-        static func track(launchType: AppCoordinator.LaunchType) {
+        static func track(launchType: AppCooridnator.LaunchType) {
             guard let event = Event(launchType: launchType) else {
                 return
             }
@@ -622,7 +627,7 @@ struct LaunchTracker {
         }
 
         private static func send(event: Event) {
-            /* TODO: send event to your analytics */
+            // send event to your analytics
         }
     }
 }
