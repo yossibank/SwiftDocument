@@ -14,7 +14,7 @@ final class MainViewController: UIViewController {
         button.backgroundColor = .blue
         return button
     }()
-    
+
     private let pushButton: UIButton = {
         let button = UIButton()
         button.setTitle("PUSH", for: .normal)
