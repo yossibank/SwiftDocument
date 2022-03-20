@@ -64,7 +64,7 @@ extension ProductFlowController: ProductListControllerDelegate {
 ```
 
 ## 追加または削除できる子FlowController
-- Coorinatorの場合
+- Coorinatorの場合  
 Coordinatorでは子Coordinatorの配列を保持し、それをアドレス(`===`演算子)を用いて識別する必要があります。  
 
 ```swift
@@ -91,7 +91,7 @@ class Coordinator {
 }
 ```
 
-- FlowControllerの場合
+- FlowControllerの場合  
 FlowControllerはUIViewControllerのサブクラスであるので、子FlowControllerを全て保持するViewControllerを持っています。  
 そのため、以下の拡張を追加するだけで子FlowControllerの追加や削除が簡単にできます。  
 
@@ -150,7 +150,7 @@ extension AppFlowController: LoginFlowControllerDelegate {
 ```
 
 ## AppFlowControllerはUIWindowについて知る必要はない
-- Coordinatorの場合
+- Coordinatorの場合  
 通常、AppDelegateが保持するAppCoordinatorをCoordinatorのルートとして保持する。  
 例えば、ログイン状況に応じてLoginControllerとMainControllerのどちらをrootViewControllerとして設定するかを決める場合、そのためにはUIWindowをinjectionする必要がある。  
 
@@ -178,7 +178,7 @@ final class AppCoordinator: Coordinator {
 }
 ```
 
-- FlowControllerの場合
+- FlowControllerの場合  
 通常のUIViewControllerを同様に扱えるので、FlowControllerをrootViewControllerとして設定するだけで良い。
 
 ```swift
@@ -193,7 +193,7 @@ appFlowController.start()
 ## LoginFlowControllerは独自のフローを管理できる
 UINavigationControllerをベースとしたログインフローがあり、LoginController, ForgetPasswordController, SignUpControllerを表示できるとする。
 
-- Coordinatorの場合
+- Coordinatorの場合  
 LoginCoordinatorのstart()では何をすべきでしょうか。  
 LoginControllerを初期化して、UINavigationControllerのrootViewControllerに設定することでしょうか？  
 LoginCoordinatorは内部でこの埋め込みUINavigationControllerを作成することができますが、その場合、UIWindowは親のAppCoordinatorの中で非公開(private)になっているので、UIWindowのrootViewControllerにはアタッチできません。
@@ -228,7 +228,7 @@ final class LoginCoordinator: Coordinator {
 }
 ```
 
-- FlowControllerの場合
+- FlowControllerの場合  
 LoginFlowControllerはContainerViewControllerを利用しているため、UIKitの動作に上手くフィットします。  
 AppFlowControllerはLoginFlowControllerを追加し、LoginFlowControllerはembeddedNavigatgionControllerを作成するだけで済みます。  
 
@@ -266,10 +266,10 @@ final class LoginFlowController: UIViewController {
 ```
 
 ## FlowControllerとResponder Chain
-* Responder Chain
-- 外側からユーザ操作として発生したイベントが送信されるオブジェクト(シングルタップやダブルタップ、スワイプなどのジェスチャ...)
+- Responder Chain  
+    → 外側からユーザ操作として発生したイベントが送信されるオブジェクト(シングルタップやダブルタップ、スワイプなどのジェスチャ...)
 
-- Coordinatorの場合
+- Coordinatorの場合  
 時には、親Coordinatorに処理をバブルアップ(徐々に階層を上げていく)する素早い方法が必要です。  
 その方法の一つとして、関連するオブジェクトとプロトコル拡張を使用堤UIReponsderチェーンを複製することで、Coordinatorとの相互接続を行います。  
 
@@ -299,11 +299,11 @@ open class Coordinator<T: UIViewController>: UIResponder, Coordinating {
 }
 ```
 
-- FlowControllerの場合
+- FlowControllerの場合  
 FlowControllerはUIResponderを継承したUIViewControllerであるため、Responder Chainはすぐに発生します。  
 
 ## FlowControllerとTrait Collection
-- FlowController
+- FlowController  
 FlowControllerは親ViewControllerであるため、そのtrait collectionをオーバーライドすれば、そのフロー内全てのViewControllerのサイズクラスに影響を与えることができます。  
 
 ```swift
@@ -317,7 +317,7 @@ appFlowController.setOverrideTraitCollection(trait, forChildViewController: logi
 ```
 
 ## FlowControllerとBack Button
-- Coordinatorの場合
+- Coordinatorの場合  
 UINavigationControllerの問題点として、デフォルトの戻るボタンをクリックすると、ナビゲーションスタックからViewControllerがポップアウトし、そしてCooridnatorはそのことを意識していません。  
 Coordinatorの場合は、CooridnatorとUIViewControllerを同期させ、UINavigationControllerDelegateをフックして処理する必要があります。  
 
@@ -374,7 +374,7 @@ final class NavigationController: UIViewController {
 
 ```
 
-- FlowControllerの場合
+- FlowControllerの場合  
 FlowControllerは単なるUIViewControllerであるため、子FlowControllerを手動で管理する必要はありません。  
 子FlowControllerはpopやdismissをすることで削除されます。  
 UINavigationControllerのイベントをリスニングしたい場合は、FlowControllerの内部で処理するだけになります。  
@@ -415,7 +415,7 @@ extension LoginFlowController: UINavigationControllerDelegate {
 ```
 
 ## FlowControllerとcallback
-- FlowController
+- FlowController  
 デリゲートパターンを使って、FlowControllerにフロー内の別のViewControllerを表示するように通知することができます。  
 
 ```swift
