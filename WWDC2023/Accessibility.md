@@ -1,8 +1,6 @@
-# WWDC2023
+# Build accessible apps with SwiftUI and UIKit
 
-## Build accessible apps with SwiftUI and UIKit
-
-### アクセシビリティの強化
+## アクセシビリティの強化
 
 * **ボタンのON/OFF切り替えによるアクセシビリティの提供**
 
@@ -226,7 +224,7 @@ class ViewController: UIViewController {
 }
 ```
 
-### アクセシビリティの視認性向上
+## アクセシビリティの視認性向上
 
 * **形状まで完全一致の特定**
 
@@ -244,7 +242,7 @@ struct ImageView: View {
 }
 ```
 
-### 最新状態の保持
+## 最新状態の保持
 
 * **Accessibility block based setters(UIKit)**
 
