@@ -2,7 +2,7 @@
 
 ## Utilizing scheme macros
 
-* @Attribute scheme
+* **@Attribute scheme**
 
 ``` swift
 @Model
@@ -43,14 +43,15 @@ final class Trip {
 
 ## Evolving schemas
 
-* VersionedSchema(以前のスキーマをカプセル化する)
-* SchemaMigrationPlan(VersionedSchemaの総順序を元に必要な移行を順番に実行する)
-* 2つの移行ステージ
-  * Lightweight
-    * 既存のデータをマイグレーションするためにコードを追加する必要はない
-    * 日付プロパティにoriginalNameを追加したり、リレーションシップの削除ルールを変更したりする場合
-  * Custom
-    * 名前を一意にする場合などは、重複排除するためのカスタムマイグレーションステージを作成する必要がある
+* **Migrationに必要な要素**
+  * VersionedSchema(以前のスキーマをカプセル化する)
+  * SchemaMigrationPlan(VersionedSchemaの総順序を元に必要な移行を順番に実行する)
+  * 2つの移行ステージ
+    * Lightweight
+      * 既存のデータをマイグレーションするためにコードを追加する必要はない
+      * 日付プロパティにoriginalNameを追加したり、リレーションシップの削除ルールを変更したりする場合
+    * Custom
+      * 名前を一意にする場合などは、重複排除するためのカスタムマイグレーションステージを作成する必要がある
 
 ``` swift
 enum SampleTripsSchemeV1: VersionedSchema {
