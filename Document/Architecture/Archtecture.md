@@ -184,3 +184,67 @@ final class MessageSender<API: MessageSenderAPI, Input: MessageInput> where API.
 ## アーキテクチャ
 
 アプリの大まかなレイヤー(層)分割の捉え方
+
+* GUIアーキテクチャ
+  * システム本来の関心領域(ドメイン)を、UI(プレゼンテーション)から引き離す
+  * UIにもシステム本来の関心にも該当しない処理は考慮しない
+    * 例) サーバーAPIからのデータを試み、そこで発生したネットワークエラーをハンドリングする
+    * 例) データをストレージに永続化する
+
+* システムアーキテクチャ
+  * UIという単位にとらわれず、システム全体の構造で捉える
+
+## MVC(GUIアーキテクチャ)
+
+* プログラムを「入力」「出力」「データの処理」の3つの要素に分け、それぞれ**Controller**、**View**、**Model**と定義したアーキテクチャ(**Model-View-Controller**)
+
+<img src="../../Image/Architecture1.png" width=100%>
+
+* **Model** → 各種ビジネスロジックのかたまり
+* **View** → 画面の描画を担当
+* **Controller** → 何かしらの入力に対する適切な処理を行うだけでなく、ModelオブジェクトとViewオブジェクトを保持する。Modelオブジェクトに処理を依頼し、受け取った結果を使ってViewオブジェクトへ描画を指示する。
+
+## MVP(GUIアーキテクチャ)
+
+* コンポーネント間を疎結合にすることでテスト容易性と作業分担のしやすさを目的とし、それぞれを**Presenter**、**View**、**Model**と定義したアーキテクチャ(**Model-View-Presenter**)
+
+### Passive View
+
+<img src="../../Image/Architecture2.png" width=100%>
+
+* **Model** → Presenterからのみアクセスされ、Viewとは直接の関わりを持たない
+* **View** → Presenterからの描画指示に従うだけで、完全に受け身な立ち位置
+* **Presenter** → すべてのプレゼンテーションロジックを受け持つ
+
+### Supervising Controller
+
+<img src="../../Image/Architecture3.png" width=100%>
+
+* **Model** → Presenterからのみアクセスされ、必要に応じてViewに対してイベントを通知する
+* **View** → PresenterとModelの双方から描画処理を受け、簡単なプレゼンテーションロジックを受け持つ
+* **Presenter** → 複雑なプレゼンテーションロジックを担う
+
+## MVVM(GUIアーキテクチャ)
+
+* それぞれを**ViewModel**、**View**、**Model**と定義し、画面の描写処理をViewに、画面描写のロジックをViewModelコンポーネントに閉じ込めるアーキテクチャ(**Model-View-ViewModel**)
+
+* View-ViewModel間はデータバインディングで関連付けられ、ViewModelの状態変更に同期してViewの状態も更新され、画面に反映される。宣言的なバインディングにより、ViewModelの自身の状態を更新するだけで、Viewの描画処理が発火され、手続的な描画指示の必要がなくなる
+
+* 関数型リアクティブプログラミングと相性が良い(Combine, RxSwift, RactiveSwift)
+
+<img src="../../Image/Architecture4.png" width=100%>
+
+* **Model** → UIに関係しない純粋なドメインロジックやそのデータを保持する
+* **View** → ユーザー操作の受け付けと、画面表示を担当する。ViewModelが保持する状態とデータバインディングし、ユーザー入力に応じてViewModelが保持するデータを加工・更新することで、バインディングした画面表示を更新する
+* **ViewModel** → View-Model間の画面表示のための仲介役で次の責務を担う
+  * Viewに表示するためのデータを保持する
+  * Viewからイベントを受け取り、Modelの処理を呼び出す
+  * Viewからイベントを受け取り、加工して値を更新する
+
+## Flux(GUIアーキテクチャ)
+
+* データフローが単一方向であるアーキテクチャ
+
+<img src="../../Image/Architecture5.png" width=100%>
+
+* 
