@@ -35,7 +35,7 @@ macro stringify(_ value: Int) -> (Int, String)
 // 展開を実行するために、各Macroはコンパイラ・プラグインで定義される
 ```
 
-<img src="../../Image/Write_Swift_macros.png" width=100%>
+<img src="../../../Image/Write_Swift_macros.png" width=100%>
 
 ## Create a macro
 

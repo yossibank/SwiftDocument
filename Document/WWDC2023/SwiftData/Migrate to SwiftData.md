@@ -4,7 +4,7 @@
 
 * **CoreDataからSwiftDataへの移行**
 
-<img src="../../Image/Migrate_to_SwiftData_1.png" width=100%>
+<img src="../../../Image/Migrate_to_SwiftData_1.png" width=100%>
 
 ## Complete adoption
 
@@ -71,7 +71,7 @@ var trips: [Trip]
 
 * **CoreDataとSwiftDataの共存**
 
-<img src="../../Image/Migrate_to_SwiftData_2.png" width=80%>
+<img src="../../../Image/Migrate_to_SwiftData_2.png" width=80%>
 
 ``` swift
 // Setting store path for Core Data store
