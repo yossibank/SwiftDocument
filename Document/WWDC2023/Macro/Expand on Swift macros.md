@@ -97,14 +97,14 @@ func printAdd(_ a: Int, _ b: Int) {
 printAdd(1, 2) // "a + b = 3"
 ```
 
-<img src="../../../Image/Expand_on_Swift_macros_1.png" width=100%>
+<img src="../../../Image/WWDC2023/Expand_on_Swift_macros_1.png" width=100%>
 
 ## Macro roles
 
 * **Macroの役割**
   * Macroのルールセット(適用する場所と方法、どのようなコードに展開するか、その展開をコードのどこに挿入するかを管理する)
 
-<img src="../../../Image/Expand_on_Swift_macros_2.png" width=100%>
+<img src="../../../Image/WWDC2023/Expand_on_Swift_macros_2.png" width=100%>
 
 * **freestanding expression**
 
@@ -148,8 +148,8 @@ let image = #unwrap(downloadedImage, message: "was already checked")
 
 * **freestanding declaration**
 
-<img src="../../../Image/Expand_on_Swift_macros_3.png" width=100%>
-<img src="../../../Image/Expand_on_Swift_macros_4.png" width=100%>
+<img src="../../../Image/WWDC2023/Expand_on_Swift_macros_3.png" width=100%>
+<img src="../../../Image/WWDC2023/Expand_on_Swift_macros_4.png" width=100%>
 
 ``` swift
 // 2次元の配列型を必要とする統計分析
@@ -396,7 +396,7 @@ extension DictionaryStorageMacro: ConformanceMacro, MemberAttributeMacro, Access
 
 * **SwiftSyntaxの木構造**
 
-<img src="../../../Image/Expand_on_Swift_macros_5.png" width=100%>
+<img src="../../../Image/WWDC2023/Expand_on_Swift_macros_5.png" width=100%>
 
 * **Macroのエラー表現**
 

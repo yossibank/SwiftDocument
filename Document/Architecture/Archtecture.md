@@ -198,7 +198,7 @@ final class MessageSender<API: MessageSenderAPI, Input: MessageInput> where API.
 
 * プログラムを「入力」「出力」「データの処理」の3つの要素に分け、それぞれ**Controller**、**View**、**Model**と定義したアーキテクチャ(**Model-View-Controller**)
 
-<img src="../../Image/Architecture1.png" width=100%>
+<img src="../../Image/Architecture/Architecture1.png" width=100%>
 
 * **Model** → 各種ビジネスロジックのかたまり
 * **View** → 画面の描画を担当
@@ -210,7 +210,7 @@ final class MessageSender<API: MessageSenderAPI, Input: MessageInput> where API.
 
 ### Passive View
 
-<img src="../../Image/Architecture2.png" width=100%>
+<img src="../../Image/Architecture/Architecture2.png" width=100%>
 
 * **Model** → Presenterからのみアクセスされ、Viewとは直接の関わりを持たない
 * **View** → Presenterからの描画指示に従うだけで、完全に受け身な立ち位置
@@ -218,7 +218,7 @@ final class MessageSender<API: MessageSenderAPI, Input: MessageInput> where API.
 
 ### Supervising Controller
 
-<img src="../../Image/Architecture3.png" width=100%>
+<img src="../../Image/Architecture/Architecture3.png" width=100%>
 
 * **Model** → Presenterからのみアクセスされ、必要に応じてViewに対してイベントを通知する
 * **View** → PresenterとModelの双方から描画処理を受け、簡単なプレゼンテーションロジックを受け持つ
@@ -232,7 +232,7 @@ final class MessageSender<API: MessageSenderAPI, Input: MessageInput> where API.
 
 * 関数型リアクティブプログラミングと相性が良い(Combine, RxSwift, RactiveSwift)
 
-<img src="../../Image/Architecture4.png" width=100%>
+<img src="../../Image/Architecture/Architecture4.png" width=100%>
 
 * **Model** → UIに関係しない純粋なドメインロジックやそのデータを保持する
 * **View** → ユーザー操作の受け付けと、画面表示を担当する。ViewModelが保持する状態とデータバインディングし、ユーザー入力に応じてViewModelが保持するデータを加工・更新することで、バインディングした画面表示を更新する
@@ -245,6 +245,6 @@ final class MessageSender<API: MessageSenderAPI, Input: MessageInput> where API.
 
 * データフローが単一方向であるアーキテクチャ
 
-<img src="../../Image/Architecture5.png" width=100%>
+<img src="../../Image/Architecture/Architecture5.png" width=100%>
 
 * 
