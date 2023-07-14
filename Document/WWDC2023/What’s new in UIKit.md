@@ -45,7 +45,7 @@ class SlideshowView: UIView {
 // viewIsAppearingは表示遷移中に一度のみ呼び出され、Viewがレイアウトを必要としない場合でも呼び出される
 ```
 
-<img src="../../Image/WWDC2023/What’s_new_in UIKit_1.png" width=100%>
+<img src="../../Image/WWDC2023/What’s_new_in UIKit.png" width=100%>
 
 * **Trait system enhancements**
   * カスタムtraitを定義可能に
