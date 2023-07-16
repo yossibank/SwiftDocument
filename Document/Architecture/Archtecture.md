@@ -247,4 +247,52 @@ final class MessageSender<API: MessageSenderAPI, Input: MessageInput> where API.
 
 <img src="../../Image/Architecture/Architecture5.png" width=100%>
 
-* 
+* **Action** → 実行する処理を特定するためのtypeと、実行する処理に紐づくdataを保持したオブジェクト
+* **Dispatcher** → Actionを受け取り、自身に登録されているStoreに伝える
+* **Store** → 状態を保持し、Dispatcherから伝わったActionのtypeとdataに応じて、状態を変更する
+* **View** → Storeの状態を購読し、その変更に応じて画面を更新する
+
+<img src="../../Image/Architecture/Architecture6.png" width=100%>
+
+※ ユーザーの入力を受けたViewは、その入力をもとにActionを生成し、Dispatcherに渡される。Storeの状態はAction経由でのみ変更される。
+
+
+* Viewコンポーネント
+  * ユーザーの何らかの入力によるイベント
+
+<img src="../../Image/Architecture/Architecture7.png" width=100%>
+
+* Actionコンポーネント
+  * 何らかの処理を行い、その結果からActionの生成
+  * 生成したActionをDispatcherへ送信
+
+<img src="../../Image/Architecture/Architecture8.png" width=100%>
+<img src="../../Image/Architecture/Architecture9.png" width=100%>
+
+* Dispatcherコンポーネント
+  * register(callback:)をStore側で呼び出し、Callbackを登録してActionを受け取る
+  * dispatch(_:)でActionCreatorがActionを送信する
+
+<img src="../../Image/Architecture/Architecture10.png" width=100%>
+
+* Storeコンポーネント
+  * Dispatcherのregister(callback:)を使ってCallbackを登録し、そのCallbackからActionを受け取る
+  * Storeの状態に変更があった場合に変更通知を送信し、Viewがその変更通知を受け取る
+
+<img src="../../Image/Architecture/Architecture11.png" width=100%>
+
+* 全体データフロー
+
+<img src="../../Image/Architecture/Architecture12.png" width=100%>
+
+## Clean Architecture(システムアーキテクチャ)」
+
+* UIだけでなくアプリケーション全体、Modelの内部表現まで踏み込んだアーキテクチャパターン。
+
+* あるシステムの1機能を実現するアプリケーションを考える時、その実現する機能の領域(ドメイン)と技術の詳細に注目し、4つのコンポーネントに切り分ける
+  * **Entity** → アプリケーションに依存しない、ドメインに関するデータ構造やビジネスロジック
+  * **Use Case** → アプリケーションで固有なロジック
+  * **インターフェースアダプター** → Use Case・フレームワークとドライバで使われるデータ構造を互いに変換する
+  * **フレームワークとドライバ** → データベース(DB)、Webなどのフレームワークやツールの「詳細」
+
+<img src="../../Image/Architecture/Architecture13.png" width=100%>
