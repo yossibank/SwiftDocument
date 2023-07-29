@@ -4,6 +4,8 @@
 
 データをグラフで表現すると、分かりやすくて視覚に訴える形で情報を伝達できる。
 
+<img src="../../../Image/HIG/Components/Content_charts_0.png" width=80%>
+
 <img src="../../../Image/HIG/Components/Content_charts_1.png" width=80%>
 
 * マーク
@@ -45,6 +47,8 @@
 
 透明または不透明の背景の上に1つのイメージが表示される、場合によっては、イメージのアニメーションシーケンスが表示されることもある。
 
+<img src="../../../Image/HIG/Components/Content_imageView.png" width=80%>
+
 ### ベストプラクティス
 
 1. イメージビューはビューの主な目的が単にイメージを表示することである場合に使用する
@@ -56,6 +60,8 @@
 
 複数行のスタイル付きテキストコンテンツを表示する、任意で編集可能にする。
 
+<img src="../../../Image/HIG/Components/Content_textView.png" width=80%>
+
 ### ベストプラクティス
 
 1. 長いテキストや編集可能なテキスト、特殊なフォーマットのテキストを表示する場合に使用する
@@ -65,6 +71,8 @@
 ## Webビュー
 
 埋め込まれたHTMLやWebサイトなどのリッチなWebコンテンツをアプリ内に直接読み込んで表示する。
+
+<img src="../../../Image/HIG/Components/Content_webView.png" width=80%>
 
 ### ベストプラクティス
 
