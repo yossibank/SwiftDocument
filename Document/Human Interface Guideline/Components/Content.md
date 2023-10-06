@@ -4,16 +4,16 @@
 
 データをグラフで表現すると、分かりやすくて視覚に訴える形で情報を伝達できる。
 
-<img src="../../../Image/HIG/Components/Content_charts_0.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Content/Chart0.png" width=80%>
 
-<img src="../../../Image/HIG/Components/Content_charts_1.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Content/Chart1.png" width=80%>
 
 * マーク
   * データについて伝えたい情報に合ったマークのタイプを選択する
 
 バー | ライン | ポイント
 :--: | :--: | :--:
-<img src="../../../Image/HIG/Components/Content_charts_2.png" width=100%> | <img src="../../../Image/HIG/Components/Content_charts_3.png" width=100%> | <img src="../../../Image/HIG/Components/Content_charts_4.png" width=100%>
+<img src="../../../Image/Human Interface Guideline/Components/Content/Chart2.png" width=100%> | <img src="../../../Image/Human Interface Guideline/Components/Content/Chart3.png" width=100%> | <img src="../../../Image/Human Interface Guideline/Components/Content/Chart4.png" width=100%>
 異なるカテゴリの値を比較するグラフ、時間の経過にともなってデータがどのように変化するかを示すグラフ | 時間の経過に伴う値の変化を表すグラフ、全体のトレンドを視覚化 | ここのデータの値を視覚的に強調する。ここのデータを精査したり、外れ値やクラスタを識別したりする
 
 * 軸
@@ -23,13 +23,13 @@
   * 軸のメモリとグリッド線のラベルにはきりのいい値を使用する(0, 5, 10など)
   * グリッド線とラベルの見た目をグラフの用途に合わせて調整する
 
-<img src="../../../Image/HIG/Components/Content_charts_5.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Content/Chart5.png" width=80%>
 
 * 説明コンテンツ
   * ユーザーがグラフをみる前にグラフの目的を理解できるような説明を記述する(VoiceOverユーザや特定の種類の認識障がいのあるユーザーにとって特に重要)
   * グラフの主要なメッセージを要約し、誰にとっても利用しやすく役に立つグラフにする(鍵となる情報を要約してユーザーが一目で把握できるようにすることが重要)
 
-<img src="../../../Image/HIG/Components/Content_charts_6.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Content/Chart6.png" width=80%>
 
 ### ベストプラクティス
 
@@ -47,7 +47,7 @@
 
 透明または不透明の背景の上に1つのイメージが表示される、場合によっては、イメージのアニメーションシーケンスが表示されることもある。
 
-<img src="../../../Image/HIG/Components/Content_imageView.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Content/ImageView.png" width=80%>
 
 ### ベストプラクティス
 
@@ -60,7 +60,7 @@
 
 複数行のスタイル付きテキストコンテンツを表示する、任意で編集可能にする。
 
-<img src="../../../Image/HIG/Components/Content_textView.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Content/TextView.png" width=80%>
 
 ### ベストプラクティス
 
@@ -72,7 +72,7 @@
 
 埋め込まれたHTMLやWebサイトなどのリッチなWebコンテンツをアプリ内に直接読み込んで表示する。
 
-<img src="../../../Image/HIG/Components/Content_webView.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Content/WebView.png" width=80%>
 
 ### ベストプラクティス
 

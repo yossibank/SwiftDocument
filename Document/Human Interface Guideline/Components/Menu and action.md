@@ -4,7 +4,7 @@
 
 共有シートとも呼ばれ、現在のコンテキストで実行できる様々なタスクを表示する。
 
-<img src="../../../Image/HIG/Menu/Menu_activityView.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Menu/ActivityView.png" width=80%>
 
 ### ベストプラクティス
 
@@ -26,7 +26,7 @@
 
 即座にアクションを開始する。
 
-<img src="../../../Image/HIG/Menu/Menu_button.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Menu/Button.png" width=80%>
 
 ### ベストプラクティス
 
@@ -59,7 +59,7 @@
 
 項目に関連する機能に直接アクセスでき、インターフェイスを1つずつ辿る手間を省く。
 
-<img src="../../../Image/HIG/Menu/Menu_contextMenu.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Menu/ContextMenu.png" width=80%>
 
 ### ベストプラクティス
 
@@ -78,7 +78,7 @@
 
 Dockにあるアプリやゲームのアイコンを副ボタンでクリックすると表示する。
 
-<img src="../../../Image/HIG/Menu/Menu_dockMenu.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Menu/DockMenu.png" width=80%>
 
 ### ベストプラクティス
 
@@ -89,7 +89,7 @@ Dockにあるアプリやゲームのアイコンを副ボタンでクリック�
 
 コピー、選択、翻訳、調べるなどの関連コマンドを表示する。現在のビュー化で選択状態になっているコンテンツの変更。
 
-<img src="../../../Image/HIG/Menu/Menu_editMenu.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Menu/EditMenu.png" width=80%>
 
 ### ベストプラクティス
 
@@ -106,9 +106,9 @@ Dockにあるアプリやゲームのアイコンを副ボタンでクリック�
 
 ユーザーが操作した時にオプションを表示し、アプリまたはゲーム内でスペースを効率的に使ってコマンドを表示する。
 
-<img src="../../../Image/HIG/Menu/Menu_menu.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Menu/Menu0.png" width=80%>
 
-<img src="../../../Image/HIG/Menu/Menu_menu1.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Menu/Menu1.png" width=80%>
 
 ### ラベル
 
@@ -142,7 +142,7 @@ Dockにあるアプリやゲームのアイコンを副ボタンでクリック�
 
 ウィンドウに関連するコントロールや情報を提示する。
 
-<img src="../../../Image/HIG/Menu/Menu_ornaments.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Menu/Ornaments.png" width=80%>
 
 ### ベストプラクティス
 
@@ -156,7 +156,7 @@ Dockにあるアプリやゲームのアイコンを副ボタンでクリック�
 
 択一的なオプションを含むメニューを表示する。
 
-<img src="../../../Image/HIG/Menu/Menu_popupButton.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Menu/PopupButton.png" width=80%>
 
 ### ベストプラクティス
 
@@ -173,7 +173,7 @@ Dockにあるアプリやゲームのアイコンを副ボタンでクリック�
 
 ボタンの目的に直接関連する項目やアクションで構成されるメニューを表示する。
 
-<img src="../../../Image/HIG/Menu/Menu_pulldownButton.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Menu/PulldownButton.png" width=80%>
 
 ### ベストプラクティス
 
@@ -192,7 +192,7 @@ Dockにあるアプリやゲームのアイコンを副ボタンでクリック�
 
 現在のビューに関連したよく使われるコマンドやコントロールにアクセスできる便利なコンポーネント。
 
-<img src="../../../Image/HIG/Menu/Menu_toolbar.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Menu/Toolbar.png" width=80%>
 
 ### ベストプラクティス
 

@@ -6,7 +6,7 @@
 
 そのコンテンツをインターフェイスの残りの部分と区別するためのボーダーやバックグラウンドカラーがデフォルトで設定されており、タイトルも含めることができる。
 
-<img src="../../../Image/HIG/Layout/Layout_box.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Layout/Box.png" width=80%>
 
 ### ベストプラクティス
 
@@ -22,7 +22,7 @@
 
 順序の付いたコンテンツのセットを管理して、カスタマイズ可能な視覚に訴えるレイアウトで表示する。
 
-<img src="../../../Image/HIG/Layout/Layout_collection.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Layout/Collection.png" width=80%>
 
 ### ベストプラクティス
 
@@ -36,7 +36,7 @@
 
 縦方向のカラムを使用して、データ階層の参照や移動を行う。
 
-<img src="../../../Image/HIG/Layout/Layout_column.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Layout/Column.png" width=80%>
 
 ### ベストプラクティス
 
@@ -49,7 +49,7 @@
 
 特定のコントロールやビューに関する情報や機能を表示したり非表示にしたりする
 
-<img src="../../../Image/HIG/Layout/Layout_disclosure.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Layout/Disclosure.png" width=80%>
 
 ### ベストプラクティス
 
@@ -74,7 +74,7 @@
 
 行に対して1つ以上の列にデータを表示する。
 
-<img src="../../../Image/HIG/Layout/Layout_list_table.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Layout/ListTable.png" width=80%>
 
 ### ベストプラクティス
 
@@ -92,7 +92,7 @@
 
 複数の別個のビューを組み合わせて1つのインタラクティブな単位にしたもの。
 
-<img src="../../../Image/HIG/Layout/Layout_rockup_0.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Layout/Rockup0.png" width=80%>
 
 ### ベストプラクティス
 
@@ -101,25 +101,25 @@
 
 * カード(ヘッダ、フッタ、およびコンテンツビューを組み合わせてメディア項目の制限していやレビューが表示される)
 
-<img src="../../../Image/HIG/Layout/Layout_rockup_1.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Layout/Rockup1.png" width=80%>
 
 * キャプションボタン(ボタンの下にタイトルとサブタイトルを含める)
 
-<img src="../../../Image/HIG/Layout/Layout_rockup_2.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Layout/Rockup2.png" width=80%>
 
 * モノグラム(人物を明確にする、イニシャルではなくイメージを使用する)
 
-<img src="../../../Image/HIG/Layout/Layout_rockup_3.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Layout/Rockup3.png" width=80%>
 
 * ポスター(イメージとオプションのタイトルおよびサブタイトルを含める)
 
-<img src="../../../Image/HIG/Layout/Layout_rockup_4.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Layout/Rockup4.png" width=80%>
 
 ## アウトラインビュー(macOS)
 
 列と行を整理されているセルのスクロールするリストで、階層型のデータの表示に適している。
 
-<img src="../../../Image/HIG/Layout/Layout_outline_view.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Layout/OutlineView.png" width=80%>
 
 ### ベストプラクティス
 
@@ -139,7 +139,7 @@
 
 複数の隣接するコンテンツパネルの表示を管理する。
 
-<img src="../../../Image/HIG/Layout/Layout_split_view.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Layout/SplitView.png" width=80%>
 
 ### ベストプラクティス
 
@@ -151,7 +151,7 @@
 
 相互排他的な複数のコンテンツパネルを同じ領域に表示する。
 
-<img src="../../../Image/HIG/Layout/Layout_tab_view.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Layout/TabView.png" width=80%>
 
 ### ベストプラクティス
 

@@ -4,7 +4,7 @@
 
 ウィンドウまたは画面の上部に表示される、コンテンツの階層のナビゲーションを補助するコンポーネント。
 
-<img src="../../../Image/HIG/Navigation/Navigation_navigationBar.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Navigation/NavigationBar.png" width=80%>
 
 ### ベストプラクティス
 
@@ -24,7 +24,7 @@
 
 選択されているファイルまたはフォルダのファイルシステムパスの表示。
 
-<img src="../../../Image/HIG/Navigation/Navigation_pathControl.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Navigation/PathControl.png" width=80%>
 
 ### ベストプラクティス
 
@@ -34,7 +34,7 @@
 
 ユーザーが入力した語句でコンテンツのコレクションを検索する。
 
-<img src="../../../Image/HIG/Navigation/Navigation_searchField.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Navigation/SearchField.png" width=80%>
 
 ### ベストプラクティス
 
@@ -44,13 +44,13 @@
 4. 消去ボタンを含める
 5. 検索履歴を表示するためにプライバシーに配慮する(スコープパーの検討)
 
-<img src="../../../Image/HIG/Navigation/Navigation_scopeBar.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Navigation/ScopeBar.png" width=80%>
 
 ## サイドバー
 
 ユーザーがアプリやゲーム内を移動したり、コンテンツのトップレベルのコレクションに素早くアクセスする。
 
-<img src="../../../Image/HIG/Navigation/Navigation_sideBar.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Navigation/SideBar.png" width=80%>
 
 ### ベストプラクティス
 
@@ -70,7 +70,7 @@
 
 バーの項目によって、同じビューの中で相互排他的なコンテンツパネル間を移動する。
 
-<img src="../../../Image/HIG/Navigation/Navigation_tabBar.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Navigation/TabBar.png" width=80%>
 
 ### ベストプラクティス
 
@@ -92,7 +92,7 @@
 
 テキストをトークンに変換できるテキストフィールドの1つ。テキストを容易に選択したり操作することができる。
 
-<img src="../../../Image/HIG/Navigation/Navigation_tokenField.png" width=80%>
+<img src="../../../Image/Human Interface Guideline/Components/Navigation/TokenField.png" width=80%>
 
 ### ベストプラクティス
 
