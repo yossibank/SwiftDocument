@@ -17,7 +17,7 @@ https://developer.apple.com/documentation/swiftui/state
 ※ @Stateでの値の変更は宣言したそのView上でのみでしかすることができなたいめ、private修飾子を付けることが推奨されている。
 
 ``` swift
-struct PlayButton: View {
+struct StateView: View {
     // @Stateの定義
     @State private var isPlaying: Bool = false
 
