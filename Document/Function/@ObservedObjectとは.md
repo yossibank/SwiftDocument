@@ -17,6 +17,10 @@ https://developer.apple.com/documentation/swiftui/observedobject
 そのため、親Viewから渡されるデータを参照するように定義を行う。(デフォルト値や初期値を設定しない)
 
 ``` swift
+final class DataSource: ObservableObject {
+    @Published var count = 0
+}
+
 struct ObservedObjectView: View {
     // デフォルト値や初期値を持つべきでない
     @ObservedObject private var dataSource = DataSource()
@@ -25,20 +29,6 @@ struct ObservedObjectView: View {
         VStack(spacing: 4) {
             Text("子View")
             Text("ObservedObject count: \(dataSource.count)")
-            Button("increment") {
-                dataSource.count += 1
-            }
-        }
-    }
-}
-
-struct StateObjectView: View {
-    @StateObject private var dataSource = DataSource()
-
-    var body: some View {
-        VStack(spacing: 4) {
-            Text("子View")
-            Text("StateObject count: \(dataSource.count)")
             Button("increment") {
                 dataSource.count += 1
             }
@@ -67,7 +57,6 @@ struct ContentView: View {
             }
 
             ObservedObjectView()
-            StateObjectView()
         }
     }
 }
