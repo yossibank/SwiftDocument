@@ -1,3 +1,0 @@
-#  Opaque Result Type
-
-## リバースジェネリクス
