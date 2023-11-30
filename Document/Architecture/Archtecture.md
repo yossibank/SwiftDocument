@@ -50,6 +50,8 @@
 
 <img src="../../Image/Architecture/Architecture1.png" width=100%>
 
+### 基本構造
+
 * **Model** → 各種ビジネスロジックのかたまり
 * **View** → 画面の描画を担当
 * **Controller** → 何かしらの入力に対する適切な処理を行うだけでなく、ModelオブジェクトとViewオブジェクトを保持する。Modelオブジェクトに処理を依頼し、受け取った結果を使ってViewオブジェクトへ描画を指示する。
@@ -58,7 +60,18 @@
 
 * コンポーネント間を疎結合にすることでテスト容易性と作業分担のしやすさを目的とし、それぞれを**Presenter**、**View**、**Model**と定義したアーキテクチャ(**Model-View-Presenter**)
 
-### Passive View
+### コンポーネント間の同期方法
+
+* **フロー同期** → 上位レイヤーのデータを下位レイヤーに都度セットしてデータを同期する(手続的同期方法)
+* **オブザーバー同期** → 監視元である下位レイヤーが監視先である上位例やからObserverパターンを使って送られるイベント通知を送ってデータを同期させる(宣言的同期方法)
+
+### 基本構造
+
+* **Model** → UIに関係しない純粋なドメインロジックやそのデータを持つ
+* **View** → ユーザー操作の受け付けと、画面表示を担当する
+* **Presenter** → ViewとModelの仲介役となり、プレゼンテーションロジックを担う
+
+### Passive View(フロー同期)
 
 <img src="../../Image/Architecture/Architecture2.png" width=100%>
 
@@ -66,7 +79,7 @@
 * **View** → Presenterからの描画指示に従うだけで、完全に受け身な立ち位置
 * **Presenter** → すべてのプレゼンテーションロジックを受け持つ
 
-### Supervising Controller
+### Supervising Controller(フロー同期 + オブザーバー同期)
 
 <img src="../../Image/Architecture/Architecture3.png" width=100%>
 
@@ -76,26 +89,30 @@
 
 ## MVVM(GUIアーキテクチャ)
 
-* それぞれを**ViewModel**、**View**、**Model**と定義し、画面の描写処理をViewに、画面描写のロジックをViewModelコンポーネントに閉じ込めるアーキテクチャ(**Model-View-ViewModel**)
+* 関数型リアクティブプログラミングと相性が良く(Combine, RxSwift, RactiveSwift)、それぞれを**ViewModel**、**View**、**Model**と定義し、画面の描写処理をViewに、画面描写のロジックをViewModelコンポーネントに閉じ込めるアーキテクチャ(**Model-View-ViewModel**)
 
 * View-ViewModel間はデータバインディングで関連付けられ、ViewModelの状態変更に同期してViewの状態も更新され、画面に反映される。宣言的なバインディングにより、ViewModelの自身の状態を更新するだけで、Viewの描画処理が発火され、手続的な描画指示の必要がなくなる
 
-* 関数型リアクティブプログラミングと相性が良い(Combine, RxSwift, RactiveSwift)
+※ データバインディング → 2つのデータの状態を監視し同期する仕組みで、片方のデータ変更をもう一方が検知して、データを自動的に更新する
 
 <img src="../../Image/Architecture/Architecture4.png" width=100%>
 
-* **Model** → UIに関係しない純粋なドメインロジックやそのデータを保持する
-* **View** → ユーザー操作の受け付けと、画面表示を担当する。ViewModelが保持する状態とデータバインディングし、ユーザー入力に応じてViewModelが保持するデータを加工・更新することで、バインディングした画面表示を更新する
-* **ViewModel** → View-Model間の画面表示のための仲介役で次の責務を担う
-  * Viewに表示するためのデータを保持する
-  * Viewからイベントを受け取り、Modelの処理を呼び出す
-  * Viewからイベントを受け取り、加工して値を更新する
+### 基本構造
+
+* **Model** → UIに関係しない純粋なドメインロジックやそのデータを持つ
+* **View** → ユーザー操作の受け付けと、画面表示を担当する
+* **ViewModel** → ViewとViewModelの仲介役となり、3つの責務を持つ
+  1. Viewに表示するためのデータを保持する
+  2. Viewからイベントを受け取り、Modelの処理を呼び出す
+  3. Viewからイベントを受け取り、加工して値を更新する
 
 ## Flux(GUIアーキテクチャ)
 
 * データフローが単一方向であるアーキテクチャ
 
 <img src="../../Image/Architecture/Architecture5.png" width=100%>
+
+### 基本構造
 
 * **Action** → 実行する処理を特定するためのtypeと、実行する処理に紐づくdataを保持したオブジェクト
 * **Dispatcher** → Actionを受け取り、自身に登録されているStoreに伝える
@@ -104,34 +121,46 @@
 
 <img src="../../Image/Architecture/Architecture6.png" width=100%>
 
-※ ユーザーの入力を受けたViewは、その入力をもとにActionを生成し、Dispatcherに渡される。Storeの状態はAction経由でのみ変更される。
+※ ユーザーの入力を受けたViewは、その入力をもとにActionを生成し、Dispatcherに渡される。Storeの状態はAction経由でのみ変更される
 
-
-* Viewコンポーネント
-  * ユーザーの何らかの入力によるイベント
+### Viewの構成とデータフロー(UIViewController, UIView)
+  * 構成
+    * ユーザーの何らかの入力によるイベント、Viewが状態を持つことはない
+  * データフロー → Storeの状態をViewに反映する
+    * NotificationCenterの通知機能やObserverパターンのライブラリを使用する
 
 <img src="../../Image/Architecture/Architecture7.png" width=100%>
 
-* Actionコンポーネント
-  * 何らかの処理を行い、その結果からActionの生成
-  * 生成したActionをDispatcherへ送信
+### Action(ActionCreator)の構成とデータフロー
+  * 構成
+    * 何らかの処理を行い、その結果からActionの生成
+    * 生成したActionをDispatcherへ送信
+  * データフロー → ユーザーの入力をもとにActionCreatorの処理を実行する
 
 <img src="../../Image/Architecture/Architecture8.png" width=100%>
 <img src="../../Image/Architecture/Architecture9.png" width=100%>
 
-* Dispatcherコンポーネント
-  * register(callback:)をStore側で呼び出し、Callbackを登録してActionを受け取る
-  * dispatch(_:)でActionCreatorがActionを送信する
+### Dispatcherの構成とデータフロー
+  * 構成
+    * ActionCreatorからActionを受け取りStoreへ伝達
+  * データフロー
+    * Dispatcherのregister(callback:)をStore側で呼び出し、Callbackを登録してActionを受け取る
+    * ActionCreatorがDispatcherのdispatch(_:)を使ってActionを送信し、Dispatcherのregister(callback:)で登録されているすべてのStoreに対して、Callbackを通じてActionを伝える
+      * NotificationCenterの通知機能やRxSwiftのPublishSubjectやRxCocoaのPublishRelayなどを使用する
 
 <img src="../../Image/Architecture/Architecture10.png" width=100%>
 
-* Storeコンポーネント
-  * Dispatcherのregister(callback:)を使ってCallbackを登録し、そのCallbackからActionを受け取る
-  * Storeの状態に変更があった場合に変更通知を送信し、Viewがその変更通知を受け取る
+* Storeの構成とデータフロー
+  * 構成
+    * DispatcherからActionを受け取り、Actionのtypeとdataをもとに自身の状態を更新し、最終的にその状態がViewに反映される
+  * データフロー
+    * Dispatcherのregister(callback:)を使ってCallbackを登録し、そのCallbackからActionを受け取る
+    * Storeの状態に変更があった場合に変更通知を送信し、Viewがその変更通知を受け取る
+      * NotificationCenterの通知機能やRxSwiftのPublishSubjectやRxCocoaのPublishRelayなどを使用する
 
 <img src="../../Image/Architecture/Architecture11.png" width=100%>
 
-* 全体データフロー
+### 全体データフロー
 
 <img src="../../Image/Architecture/Architecture12.png" width=100%>
 
@@ -171,7 +200,7 @@
   * UI、データベース、デバイスドライバ、Web APIクライアントなどの最外層として、実装の詳細で、環境や顧客の要求変化にもっとも影響を受ける場所
   * UIの実装先OSの種類、フレームワークといった環境も扱う(UIKitやAlamofireなど)
 
-## TCA
+## The Composable Architecture
 
 * SwiftUIが状態管理にアプローチする方法に対しての、5つの大きな問題を定型化し、これを解決するためのアーキテクチャ(SwiftUI版のRedux)
 
