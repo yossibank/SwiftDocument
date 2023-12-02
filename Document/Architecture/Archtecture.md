@@ -150,7 +150,7 @@
 
 <img src="../../Image/Architecture/Architecture10.png" width=100%>
 
-* Storeの構成とデータフロー
+### Storeの構成とデータフロー
   * 構成
     * DispatcherからActionを受け取り、Actionのtypeとdataをもとに自身の状態を更新し、最終的にその状態がViewに反映される
   * データフロー
@@ -164,9 +164,329 @@
 
 <img src="../../Image/Architecture/Architecture12.png" width=100%>
 
+* メリット
+  * データフローが単一方向になっていることで、アプリの処理の流れの推測がしやすい
+  * View・Action・Dispatcher・Storeと役割が分かれることで、どこに実装すべきかが分かりやすい
+  * Storeが状態が管理する役割であるため、View ControllerやViewから状態管理のコードを削除できる
+  * Dispatcherがハブとなっているため、テストでの結果取得やテストデータの挿入がしやすい
+  * アプリの規模が大きくなったとしても、耐えうるスケーラビリティがある
+
+* デメリット
+  * Actionをディスパッチする際にStoreがまだ生成されているない状態があるため、Storeのライフサイクルを気にする必要がある
+  * アプリの規模が大きくなるにつれて、Actionが肥大化していく
+  * Storeを変更するために、Actionを生成しDispatcherを通すというフローに対して、アプリの規模次第では煩わしさを感じる場合がある
+
+## Redux(GUIアーキテクチャ)
+
+* Fluxアーキテクチャのアイデアと、関数型言語のElmによる複雑性に対するアプローチの影響を受けて誕生したアーキテクチャ
+  * Fluxアーキテクチャの情報の伝播を1方向に制限する特徴と踏襲し、いつどのように更新が起きるかを明瞭にする
+  * Elmアーキテクチャの純粋関数による副作用の排除や、イミュータブルな状態表現の制約を踏襲し、厳格で整合性のとれた状態管理を実現する
+
+* Reduxは**状態変化を予測可能にしよう**と試みる
+  * **リーダビリティ(読みやすさ)** → 予測可能な形でコードを構造化することで読むコストを下げる
+
+<img src="../../Image/Architecture/Architecture14.png" width=100%>
+
+### 基本構造
+
+* **Action** → Reduxレイヤーに対して人氏のビジネスロジックの実行や状態の変更を依頼するためのメッセージ(値オブジェクトで表現)
+* **State** → アプリケーションの状態を表現するデータの集合
+* **Reducer** → Actionと現在のStateを入力にとり、新しいStateを出力する関数
+* **Store** → StateとReducerを保持するアプリケーションで単一のインスタンスで、ActionのディスパッチとReducerの実行、ViewレイヤーからのStateの購読機能を有する
+
+### 3つの原則
+
+1.  信頼できる一意となる状態を唯一とする(Single source of truth)
+
+各状態のインスタンスをあちこちに分散することなく、アプリケーション全体の状態を単一のオブジェクトツリー(State)で管理する。Stateは関数を所有しないデータのみで表現されるシンプルなオブジェクトで構成される。
+
+<img src="../../Image/Architecture/Architecture15.png" width=100%>
+
+状態を単一のオブジェクトツリーで構成することで、アプリケーションの開発時のデバッグが容易になる恩恵もある。複雑な状態変化や振る舞いが伴うアプリケーションでは、実行時の状態が観察しやすくなる。
+
+2. 状態はイミュータブルで表現する(State is read-only)
+
+作成されたStateが値を変えることのできない不変なインスタンスであることを意味する。Reducerにより新たなStateが生成されるまでの間、Viewレイヤーで参照している現在のStateはまったく変更されないことが保証される。そのため、イミュータブルな現在のStateを参照している間は、アプリケーション全体で一意で整合性のとれた状態のもとでViewレイヤーの処理を行うことができる。
+
+<img src="../../Image/Architecture/Architecture16.png" width=100%>
+
+Stateの変更はActionがディスパッチを介してReducerのみ実施できるように制約される。Reducerは現在のStateとディスパッチされたActionの2つを入力に受け、新しい出力をする関数で、現在のStateはイミュータブルであるため値の変更を行わず、現在のStateのコピーを作成する。Reducerに記述されたビジネスロジックの実行結果をコピーしたStateに適用し、新たなStateとして出力する。このようにして、ReducerではStateの変更を実施する。
+
+3. 状態の変更は純粋関数で記述する(Changes are made with pure functions)
+
+新たなStateの作成を担うReducerは関数として表現する。ここでいう関数とは、オブジェクト指向なクラスやメソッドによる記述ではなく、Reducer自身が関数(Reducer関数)として記述され、さらに純粋関数であることが求められる。
+
+<img src="../../Image/Architecture/Architecture17.png" width=100%>
+
+純粋関数は関数の評価において副作用を発生させない点が最大の特性であり、関数に入力されていない要素が出力とは関係ない箇所で変化することがないことを意味する。
+
+※ 純粋関数の特性
+
+1. 与えられた要素や関数外の要素を変化させず、戻り値以外の出力を行わない(副作用の排除)
+2. 取り扱うすべての要素が引数として宣言されている(引数以外の要素を参照しない)
+3. 入力に対して出力が常に一意である(同じ入力には常に同じ出力を返す)
+
+### 単一方向のデータフロー
+
+<img src="../../Image/Architecture/Architecture18.png" width=100%>
+
+単一方向のデータフローを厳守するように設計され、ユーザーの操作やシステムが起因となるすべての状態変化は、Actionのディスパッチによる形式化された手続きにもとづいてのみ開始される。この手続きは、いつ、どこから、どのような状態を変化しようとしたのかを明確にし、開発者に対して変更の要因を把握できるように促す。
+
+StoreはActionがディスパッチされるとReducerによって新たなStateを作成し、Viewレイヤーで購読している箇所に新たなStateを一斉にに通知する。Viewレイヤーは通知された新しいStateをもとに画面の描画や任意の処理を行う。
+
+以上のActionを起点とする手続きを1回のフローとして、このフローを幾度も重ねることでアプリケーション全体の振る舞いをユーザーに提供する。(規律と規制のとれた状態管理はロジックがより予測しやすく開発者の理解の手助けとなる)
+
+Viewレイヤーの関心はActionの種類とActionに付与するデータおよびStateのデータ構造のみとなる。ViewレイヤーはReducerを直接実行することはできず、どんなReducerが存在するか知るすべもなく、Reducerがどのように記述されているかについてもまったく関知しない。また、ViewレイヤーはStoreにより通知されるStateがイミュータブルであるため、状態の値を直接変更することはできない。
+
+状態の変化を伴うロジックは、Viewレイヤーから完全に隔離されReduxレイヤーの管轄下に配置される。Reduxレイヤーでビジネスロジックの中心的な役割を担うReducerは、Actionのディスパッチ元がViewレイヤーのどこで、結果のStateがViewレイヤーでどのように利用されるのかについて関知しない。Reducerの関心事はアプリケーション全体のStateを新しくすべて作り直すことだけである。
+
+Actionをディスパッチした呼び出し元が、ディスパッチ呼び出しの戻り値として新しいStateを即時に取得することはできない。伝達と結果の受け取りが、いわゆるメソッドの呼び出しのように実行時の対にはなっていないためである。結果である新たなStateは、ViewレイヤーでStoreを購読している箇所(画面など)へ通知される。
+
+作用の伝達と結果の通知が分離されることで、ViewレイヤーとReduxレイヤー間の依存性を弱めている。これら2つの独立性の観点により、双方のレイヤーが関知し合わず、影響範囲が局所的に閉じた構造を実現している。
+
+### ReSwiftでのReduxアーキテクチャ適用
+
+* State → アプリケーションの全体の状態を表すデータ
+
+<img src="../../Image/Architecture/Architecture19.png" width=100%>
+
+``` swift
+// private(set)アクセス修飾子を付与することで、Viewレイヤーから変更できないことを明示化する
+struct AppState: ReSwift.StateType {
+    private(set) var timelineState: TimelineState
+    private(set) var userProfileState: UserProfileState?
+}
+
+struct TimelineState: ReSwift.StateType {
+    private(set) var tweets: [Tweet]
+    private(set) var response: [Tweet]
+}
+
+struct UserProfileState: ReSwift.StateType {
+    private(set) var userProfile: UserProfile
+}
+```
+
+* Action → Stateに対して、何かイベントが発生したことを伝えるためのメッセージ
+
+<img src="../../Image/Architecture/Architecture20.png" width=100%>
+
+``` swift
+extension TimelineState {
+    enum Action: ReSwift.Action {
+        case requestStart()
+        case requestSucess(response: [Tweet])
+        case requestError(error: Error)
+    }
+}
+
+struct ForceLogoutAction: ReSwift.Action {}
+```
+
+* ActionCreator → ディスパッチが可能な関数でActionを出力する
+
+<img src="../../Image/Architecture/Architecture21.png" width=100%>
+
+``` swift
+typealias ActionCreator = (
+    state: ReSwift.State,
+    store: ReSwift.StoreType
+)
+
+// ActionCreatorは副作用が許容されている
+func fetchGitHubRepositories(state: State, store: Store<State>) -> Action? {
+    guard case let .loggedIn(conf) = state.authState.loggedInState else {
+        return nil
+    }
+
+    Ocktokit(conf).repositories { response in
+        DispatchQueue.main.async {
+            store.dispatch(SetRepositories(repositories: response))
+        }
+    }
+    return nil
+}
+
+store.dispatch(fetchGitHubRepositories)
+```
+
+* Reducer → 現在のStateとディスパッチされたActionを入力として、新しいStateを出力する純粋関数
+
+<img src="../../Image/Architecture/Architecture22.png" width=100%>
+
+``` swift
+typealias Reducer<ReducerStateType> = (
+    action: Action,
+    state: ReducerStateType?
+) -> ReducerStateType
+
+func appReduce(action: ReSwift.Action, state: AppState?) -> AppState {
+    var state = state ?? AppState()
+    state.timelineState = TimelineState.reducer(
+        action: action,
+        state: state.timelineState
+    )
+    state.userProfile = UserProfileState.reducer(
+        action: action,
+        state: state.userProfile
+    )
+    return state
+}
+
+// 純粋関数でreducerを作成する
+extension TimelineState {
+    public static func reducer(
+        action: ReSwift.Action,
+        state: TimelineState?
+    ) -> TimelineState {
+        guard let action = action as? TimelineState.Action else {
+            return state
+        }
+
+        var state = state ?? TimelineState()
+
+        switch action {
+        case let .requestStart:
+            state.fetching = true
+            state.error = nil
+        case let .requestSuccess(response):
+            state.fetching = false
+            state.response = response
+        case let .requestError(error):
+            state.fetching = false
+            state.error = error
+        }
+
+        return state
+    }
+}
+```
+
+* Store → StateとReducerを保持し、Actionをディスパッチする。新たなStateが生成されたことをViewレイヤーで検知する購読機能を有する
+
+<img src="../../Image/Architecture/Architecture23.png" width=100%>
+
+``` swift
+open class Store<State: ReSwift.StateType>: ReSwift.StoreType {
+    var state: State! { get }
+
+    private var reducer: Reducer<State>
+
+    open func dispatch(_ action: Action) {
+        // ...
+    }
+
+    open func subscribe<S: StoreSubscriber>(_ subscriber: S) {
+        // ...
+    }
+
+    open func unsubscribe(_ subscriber: AnyStoreSubscriber) {
+        // ...
+    }
+
+    // ...
+}
+
+let store = ReSwift.Store<AppState>(
+    reducer: appReduce,
+    state: nil,
+    middeleware: []
+)
+appDelegate.store = store
+
+let someViewController = SomeViewController(store)
+```
+
+* ディスパッチ → ActionやActionCreatorをReducerに伝達するStoreの機能を担う。ディスパッチの対象がActionCreatorの場合は、ActionCreator関数を評価して結果のActionをReducerに伝達する。またMiddleware関数の実行を行う
+
+<img src="../../Image/Architecture/Architecture24.png" width=100%>
+
+``` swift
+final class TimelineViewController: UIViewController {
+    let store: Store<AppState>
+
+    init(store: Store<AppState>) {
+        self.store = store
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        store.dispatch(TimelineState.Action.requestStart)
+        store.dispatch(TimelineState.Action.requestActionCreator)
+    }
+}
+```
+
+* 購読 → Reducerによって新しいStateが生成されたことを、Viewレイヤーが検知できるようにする
+
+<img src="../../Image/Architecture/Architecture25.png" width=100%>
+
+``` swift
+final class TimelineViewController: UIViewController, StoreSubscriber {
+    let store: Store<AppState>
+
+    init(store: Store<AppState>) {
+        self.store = store
+    }
+
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+
+        store.subscribe(self) { subscription in
+            subscription.select { state in
+                state.response
+            }
+        }
+    }
+
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        store.unsubscribe(self)
+    }
+
+    func newState(state: Response<[Repository]>?) {
+        if case let .Success(response) = state {
+            dataSource = response
+            tableView.reloadData()
+        }
+    }
+}
+```
+
+* Middleware → ディスパッチされたActionがReducerに実行されるまでの間に、任意の関数を逐次的に実行するための機構
+
+<img src="../../Image/Architecture/Architecture26.png" width=100%>
+
+``` swift
+public typealias DispatchFunction = (Action) -> Void
+public typealias Middleware<State> = (
+    @escaping DispatchFunction,
+    @escaping () -> State?
+) -> (@escaping DispatchFunction) -> DispatchFunction
+
+let loggingMiddleware: ReSwift.Middleware<AppState> = { dispatch, getState in
+    return { next in
+        return { action in
+            print("[Action] \(action)")
+            print("[Before State] \(getState())")
+            next(action)
+            print("[After State] \(getState())")
+        }
+    }
+}
+
+let appStore = Store<AppState>(
+    reducer: appReduce,
+    state: nil,
+    middleware: [loggingMiddleware]
+)
+```
+
 ## Clean Architecture(システムアーキテクチャ)
 
-* UIだけでなくアプリケーション全体、Modelの内部表現まで踏み込んだアーキテクチャパターン。
+* UIだけでなくアプリケーション全体、Modelの内部表現まで踏み込んだアーキテクチャパターン
 
 * あるシステムの1機能を実現するアプリケーションを考える時、その実現する機能の領域(ドメイン)と技術の詳細に注目し、4つのコンポーネントに切り分ける
   * **Entity** → アプリケーションに依存しない、ドメインに関するデータ構造やビジネスロジック
