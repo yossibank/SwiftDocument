@@ -185,7 +185,7 @@
 * Reduxは**状態変化を予測可能にしよう**と試みる
   * **リーダビリティ(読みやすさ)** → 予測可能な形でコードを構造化することで読むコストを下げる
 
-<img src="../../Image/Architecture/Architecture14.png" width=100%>
+<img src="../../Image/Architecture/Architecture13.png" width=100%>
 
 ### 基本構造
 
@@ -200,7 +200,7 @@
 
 各状態のインスタンスをあちこちに分散することなく、アプリケーション全体の状態を単一のオブジェクトツリー(State)で管理する。Stateは関数を所有しないデータのみで表現されるシンプルなオブジェクトで構成される。
 
-<img src="../../Image/Architecture/Architecture15.png" width=100%>
+<img src="../../Image/Architecture/Architecture14.png" width=100%>
 
 状態を単一のオブジェクトツリーで構成することで、アプリケーションの開発時のデバッグが容易になる恩恵もある。複雑な状態変化や振る舞いが伴うアプリケーションでは、実行時の状態が観察しやすくなる。
 
@@ -208,7 +208,7 @@
 
 作成されたStateが値を変えることのできない不変なインスタンスであることを意味する。Reducerにより新たなStateが生成されるまでの間、Viewレイヤーで参照している現在のStateはまったく変更されないことが保証される。そのため、イミュータブルな現在のStateを参照している間は、アプリケーション全体で一意で整合性のとれた状態のもとでViewレイヤーの処理を行うことができる。
 
-<img src="../../Image/Architecture/Architecture16.png" width=100%>
+<img src="../../Image/Architecture/Architecture15.png" width=100%>
 
 Stateの変更はActionがディスパッチを介してReducerのみ実施できるように制約される。Reducerは現在のStateとディスパッチされたActionの2つを入力に受け、新しい出力をする関数で、現在のStateはイミュータブルであるため値の変更を行わず、現在のStateのコピーを作成する。Reducerに記述されたビジネスロジックの実行結果をコピーしたStateに適用し、新たなStateとして出力する。このようにして、ReducerではStateの変更を実施する。
 
@@ -216,7 +216,7 @@ Stateの変更はActionがディスパッチを介してReducerのみ実施で�
 
 新たなStateの作成を担うReducerは関数として表現する。ここでいう関数とは、オブジェクト指向なクラスやメソッドによる記述ではなく、Reducer自身が関数(Reducer関数)として記述され、さらに純粋関数であることが求められる。
 
-<img src="../../Image/Architecture/Architecture17.png" width=100%>
+<img src="../../Image/Architecture/Architecture16.png" width=100%>
 
 純粋関数は関数の評価において副作用を発生させない点が最大の特性であり、関数に入力されていない要素が出力とは関係ない箇所で変化することがないことを意味する。
 
@@ -228,7 +228,7 @@ Stateの変更はActionがディスパッチを介してReducerのみ実施で�
 
 ### 単一方向のデータフロー
 
-<img src="../../Image/Architecture/Architecture18.png" width=100%>
+<img src="../../Image/Architecture/Architecture17.png" width=100%>
 
 単一方向のデータフローを厳守するように設計され、ユーザーの操作やシステムが起因となるすべての状態変化は、Actionのディスパッチによる形式化された手続きにもとづいてのみ開始される。この手続きは、いつ、どこから、どのような状態を変化しようとしたのかを明確にし、開発者に対して変更の要因を把握できるように促す。
 
@@ -248,7 +248,7 @@ Actionをディスパッチした呼び出し元が、ディスパッチ呼び�
 
 * State → アプリケーションの全体の状態を表すデータ
 
-<img src="../../Image/Architecture/Architecture19.png" width=100%>
+<img src="../../Image/Architecture/Architecture18.png" width=100%>
 
 ``` swift
 // private(set)アクセス修飾子を付与することで、Viewレイヤーから変更できないことを明示化する
@@ -269,7 +269,7 @@ struct UserProfileState: ReSwift.StateType {
 
 * Action → Stateに対して、何かイベントが発生したことを伝えるためのメッセージ
 
-<img src="../../Image/Architecture/Architecture20.png" width=100%>
+<img src="../../Image/Architecture/Architecture19.png" width=100%>
 
 ``` swift
 extension TimelineState {
@@ -285,7 +285,7 @@ struct ForceLogoutAction: ReSwift.Action {}
 
 * ActionCreator → ディスパッチが可能な関数でActionを出力する
 
-<img src="../../Image/Architecture/Architecture21.png" width=100%>
+<img src="../../Image/Architecture/Architecture20.png" width=100%>
 
 ``` swift
 typealias ActionCreator = (
@@ -312,7 +312,7 @@ store.dispatch(fetchGitHubRepositories)
 
 * Reducer → 現在のStateとディスパッチされたActionを入力として、新しいStateを出力する純粋関数
 
-<img src="../../Image/Architecture/Architecture22.png" width=100%>
+<img src="../../Image/Architecture/Architecture21.png" width=100%>
 
 ``` swift
 typealias Reducer<ReducerStateType> = (
@@ -364,7 +364,7 @@ extension TimelineState {
 
 * Store → StateとReducerを保持し、Actionをディスパッチする。新たなStateが生成されたことをViewレイヤーで検知する購読機能を有する
 
-<img src="../../Image/Architecture/Architecture23.png" width=100%>
+<img src="../../Image/Architecture/Architecture22.png" width=100%>
 
 ``` swift
 open class Store<State: ReSwift.StateType>: ReSwift.StoreType {
@@ -399,7 +399,7 @@ let someViewController = SomeViewController(store)
 
 * ディスパッチ → ActionやActionCreatorをReducerに伝達するStoreの機能を担う。ディスパッチの対象がActionCreatorの場合は、ActionCreator関数を評価して結果のActionをReducerに伝達する。またMiddleware関数の実行を行う
 
-<img src="../../Image/Architecture/Architecture24.png" width=100%>
+<img src="../../Image/Architecture/Architecture23.png" width=100%>
 
 ``` swift
 final class TimelineViewController: UIViewController {
@@ -420,7 +420,7 @@ final class TimelineViewController: UIViewController {
 
 * 購読 → Reducerによって新しいStateが生成されたことを、Viewレイヤーが検知できるようにする
 
-<img src="../../Image/Architecture/Architecture25.png" width=100%>
+<img src="../../Image/Architecture/Architecture24.png" width=100%>
 
 ``` swift
 final class TimelineViewController: UIViewController, StoreSubscriber {
@@ -457,7 +457,7 @@ final class TimelineViewController: UIViewController, StoreSubscriber {
 
 * Middleware → ディスパッチされたActionがReducerに実行されるまでの間に、任意の関数を逐次的に実行するための機構
 
-<img src="../../Image/Architecture/Architecture26.png" width=100%>
+<img src="../../Image/Architecture/Architecture25.png" width=100%>
 
 ``` swift
 public typealias DispatchFunction = (Action) -> Void
@@ -494,31 +494,116 @@ let appStore = Store<AppState>(
   * **インターフェイスアダプター** → Use Case・フレームワークとドライバで使われるデータ構造を互いに変換する
   * **フレームワークとドライバ** → データベース(DB)、Webなどのフレームワークやツールの「詳細」
 
-<img src="../../Image/Architecture/Architecture13.png" width=100%>
+<img src="../../Image/Architecture/Architecture26.png" width=100%>
 
-### 依存性のなさ(依存性が低い→高い)
-
-* Entity → Use Case → インターフェイスアダプター → フレームワークとドライバ
-  * 依存の方向を外から内への一方向にすることで、変えやすい部分を変えやすく、維持しておきたい部分はそのままにしやすくできる
+* この4つが同心円状になるよう、もっとも純粋で他に依存のないEntityを中心に据え、その外にUse Caseを置く。逆にデータベース / Web / フレームワーク / OSのような、移植や技術遷移で変わりやすいものは最外周に配置する。残るインターフェイスアダプターは内外の変換層として、Use Caseと最外層との間に挟み込んだ階層構造を作成する。依存の方向を外から内への一方向に厳密に定める
+  * 変わりやすい部分を変えやすく、維持しておきたい部分をそのままにしやすくなる
+  * 内側にあるEntityやUse Caseは外側のWeb APIサーバーやデバイスドライバなどに依存していないので、それらの完成を待つことなくロジックをテストできる
 
 ### 依存関係のルール
 
-* Entity
-  * 処理の方法に依存しないビジネスロジックで、データ構造やメソッドの集合体
+* Entity → 処理の方法に依存しないビジネスロジックで、データ構造やメソッドの集合体
   * 外側の層には依存しないため、Use Caseや他の層にによってどのように使われるかを気にしない
 
-* Use Case
-  * Entityを使ってアプリケーション固有のビジネスロジック(構築対象のアプリケーションに対してのみ有効な処理)を実現する
+* Use Case → Entityを使ってアプリケーション固有のビジネスロジック(構築対象のアプリケーションに対してのみ有効な処理)を実現
   * UIに関する処理を持たない
 
-* インターフェイスアダプター
-  * 円の内外に合わせてデータやイベントを変換するためのレイヤー
+* インターフェイスアダプター → 円の内外に合わせてデータやイベントを変換するためのレイヤー
   * Use CaseやEntityで扱っているデータ表現をSQLやUI用のデータに変換したり、逆にデータベースやWebからのデータをUse CaseやEntityで使われる表現に変換するなど、両縁のためにつなぎの役割をこなす(PresenterやController)
   * Use Caseと最外層とを接続する役割を担うことから、Use Caseの入出力ポートを外側の何かに接続するかを決定する責務を持つ
 
-* フレームワークとドライバ
-  * UI、データベース、デバイスドライバ、Web APIクライアントなどの最外層として、実装の詳細で、環境や顧客の要求変化にもっとも影響を受ける場所
+* フレームワークとドライバ → UI、データベース、デバイスドライバ、Web APIクライアントなどの最外層
   * UIの実装先OSの種類、フレームワークといった環境も扱う(UIKitやAlamofireなど)
+
+### レイヤー間の通信
+
+* **内側の円は外側の円からのみ参照される**
+  * 内側のクラスが外側のクラスや関数を直接参照することはできない
+  * そのため依存関係逆転の原則を使用する
+
+<img src="../../Image/Architecture/Architecture27.png" width=100%>
+
+``` swift
+// Use Case層
+protocol UseCaseOutputPort: AnyObject {
+    func useCaseDidUpdate(value: Int)
+}
+
+protocol UseCaseInputPort {
+    func update(something: Int)
+}
+
+final class UseCase: UseCaseInputPort {
+    private weak var output: UseCaseOutputPort? // 通常はPresenterを保持しないと処理できなくなる
+
+    init(output: UseCaseOutputPort) {
+        self.output = output
+    }
+
+    func update(something value: Int) {
+        // 値を使ったアプリケーション固有の処理
+        // Entity層の処理・データも使える
+
+        // 依存関係逆転の法則
+        // UseCase内の処理はProtocolとしてPresenter側の依存処理として通知される
+        // Output経由でPresenterへ通知(逆方向)
+        output?.useCaseDidUpdate(value: value)
+    }
+}
+
+// インターフェイスアダプター層
+final class Presenter: UseCaseOutputPort {
+    func useCaseDidUpdate(value: Int) {
+        print("UI更新 (\(value))")
+    }
+}
+
+final class Controller {
+    private let useCaseInput: UseCaseInputPort
+
+    init(input: UseCaseInputPort) {
+        self.useCaseInput = input
+    }
+
+    func received(something value: Int) {
+        // インターフェイスアダプターはUse Caseを呼び出せる
+        // Input経由でUse Caseを呼び出し(順方向)
+        useCaseInput.udpate(something: value)
+    }
+}
+
+// 円の構築
+let useCase: UseCase = .init(output: Presenter())
+let controller: Controller = .init(input: useCase)
+
+// 処理開始
+controller.received(something: 10)
+```
+
+* **非同期を前提としたメソッド**
+  * 外の層に対して問い合わせるメソッドを用意する時の、その結果をどのように受け取るのか
+  * 完了ハンドラで結果を渡すようにする
+
+``` swift
+// Use Case層
+protocol SomeDataRepositoryProtocol: AnyObject {
+    func get(
+        ofIndex: Int,
+        completionHandler: @escaping (_ values: Result<[Int]>) -> Void
+    )
+}
+
+// インターフェイスアダプター層
+final class SomeDataRepositoryGateway: SomeDataRepositoryProtocol {
+    func get(
+        ofIndex: Int,
+        completionHandler: @escaping (_: Result<[Int]>) -> Void
+    ) {
+        // ... External Interfaceでの処理 ...
+        completionHandler(.success(result)) // 結果を渡す
+    }
+}
+```
 
 ## The Composable Architecture
 
