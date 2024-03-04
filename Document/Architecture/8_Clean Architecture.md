@@ -16,7 +16,7 @@
   * **Entity**: 最も純粋で他に依存がないものを中心に配置
   * **UseCase**: Entityの外側に配置
   * **インターフェースアダプター**: 内外の変換層としてUseCaseと最外層の間に配置
-  * **データベース/Web/OS**: 移植や技術繊維で変わりやすいものを最外周に配置
+  * **データベース/Web/OS**: 移植や技術変遷で変わりやすいものを最外周に配置
 
 ### メリット
 
@@ -184,7 +184,7 @@ final class SomeDataRepositoryGateway: SomeDataRepositoryProtocol {
 
 **GitHub内のリポジトリを検索する**
 
-### Data層
+### フレームワーク・ドライバー層
 
 * API
 
@@ -197,7 +197,7 @@ enum APIError: Error {
 }
 
 final class APIClient {
-    func fetchRepositories(query: String) async throws -> [GitHubRepositoryDTO.Item] {
+    func fetch(query: String) async throws -> [GitHubRepositoryEntity.Item] {
         let query = query.addingPercentEncoding(
             withAllowedCharacters: .urlQueryAllowed
         ) ?? ""
@@ -219,7 +219,7 @@ final class APIClient {
 
         do {
             return try JSONDecoder().decode(
-                GitHubRepositoryDTO.self,
+                GitHubRepositoryEntity.self,
                 from: data
             ).items
         } catch {
@@ -229,10 +229,12 @@ final class APIClient {
 }
 ```
 
-* DTO(Data Transfer Object)
+### Data層
+
+* Entity
 
 ``` swift
-struct GitHubRepositoryDTO: Codable {
+struct GitHubRepositoryEntity: Codable {
     let items: [Item]
 
     struct Item: Codable {
@@ -243,16 +245,22 @@ struct GitHubRepositoryDTO: Codable {
 }
 ```
 
-* Mapper
+* DataStore
 
 ``` swift
-struct GitHubRepositoryMapper {
-    static func map(dto: GitHubRepositoryDTO.Item) -> GitHubRepositoryEntity {
-        .init(
-            id: dto.id,
-            name: dto.name,
-            description: dto.description
-        )
+protocol GitHubRepositoryDataStoreProtocol {
+    func fetch(query: String) async throws -> [GitHubRepositoryEntity.Item]
+}
+
+struct GitHubRepositoryDataStore: GitHubRepositoryDataStoreProtocol {
+    private let apiClient: APIClient
+
+    init(apiClient: APIClient) {
+        self.apiClient = apiClient
+    }
+
+    func fetch(query: String) async throws -> [GitHubRepositoryEntity.Item] {
+        try await apiClient.fetch(query: query)
     }
 }
 ```
@@ -261,28 +269,49 @@ struct GitHubRepositoryMapper {
 
 ``` swift
 protocol GitHubRepositoryProtocol {
-    func fetch(query: String) async throws -> [GitHubRepositoryEntity]
+    func fetch(query: String) async throws -> [GitHubRepositoryEntity.Item]
 }
 
-final class GitHubRepository: GitHubRepositoryProtocol {
-    private let apiClient = APIClient()
+struct GitHubRepository: GitHubRepositoryProtocol {
+    private let dataStore: GitHubRepositoryDataStore
 
-    func fetch(query: String) async throws -> [GitHubRepositoryEntity] {
-        let dto = try await apiClient.fetchRepositories(query: query)
-        return dto.map(GitHubRepositoryMapper.map)
+    init(dataStore: GitHubRepositoryDataStore) {
+        self.dataStore = dataStore
+    }
+
+    func fetch(query: String) async throws -> [GitHubRepositoryEntity.Item] {
+        try await dataStore.fetch(query: query)
     }
 }
 ```
 
 ### Domain層
 
-* Entity
+* Model
 
 ``` swift
-struct GitHubRepositoryEntity: Hashable {
+struct GitHubRepositoryModel: Hashable {
     var id: Int
     var name: String
     var description: String?
+}
+```
+
+* Translator
+
+``` swift
+protocol GitHubRepositoryTranslatorProtocol {
+    func translate(from entity: GitHubRepositoryEntity.Item) -> GitHubRepositoryModel
+}
+
+struct GitHubRepositoryTranslator: GitHubRepositoryTranslatorProtocol {
+    func translate(from entity: GitHubRepositoryEntity.Item) -> GitHubRepositoryModel {
+        .init(
+            id: entity.id,
+            name: entity.name,
+            description: entity.description
+        )
+    }
 }
 ```
 
@@ -290,19 +319,25 @@ struct GitHubRepositoryEntity: Hashable {
 
 ``` swift
 protocol GithubRepositoryUseCaseProtocol {
-    func execute(query: String) async throws -> [GitHubRepositoryEntity]
+    func fetch(query: String) async throws -> [GitHubRepositoryModel]
 }
 
-final class GitHubRepositoryUseCase: GithubRepositoryUseCaseProtocol {
+struct GitHubRepositoryUseCase: GithubRepositoryUseCaseProtocol {
     private let repository: GitHubRepositoryProtocol
+    private let translator: GitHubRepositoryTranslatorProtocol
 
-    init(repository: GitHubRepositoryProtocol) {
+    init(
+        repository: GitHubRepositoryProtocol,
+        translator: GitHubRepositoryTranslatorProtocol
+    ) {
         self.repository = repository
+        self.translator = translator
     }
 
-    func execute(query: String) async throws -> [GitHubRepositoryEntity] {
+    func fetch(query: String) async throws -> [GitHubRepositoryModel] {
         do {
-            return try await repository.fetch(query: query)
+            let entity = try await repository.fetch(query: query)
+            return entity.map { translator.translate(from: $0) }
         } catch {
             throw error
         }
@@ -317,7 +352,7 @@ final class GitHubRepositoryUseCase: GithubRepositoryUseCaseProtocol {
 ``` swift
 @MainActor
 final class GitHubRepositoryViewModel: ObservableObject {
-    @Published var repositories: [GitHubRepositoryEntity] = []
+    @Published var repositories: [GitHubRepositoryModel] = []
 
     private let useCase: GithubRepositoryUseCaseProtocol
 
@@ -327,7 +362,7 @@ final class GitHubRepositoryViewModel: ObservableObject {
 
     func search(query: String) async {
         do {
-            repositories = try await useCase.execute(query: query)
+            repositories = try await useCase.fetch(query: query)
         } catch {
             print(error)
         }
@@ -357,21 +392,42 @@ struct GitHubRepositoryView: View {
 }
 ```
 
-### 起動
+### 構築
+
+* Builder
+
+``` swift
+protocol GitHubRepositoryBuilderProtocol {
+    func build() -> GitHubRepositoryView
+}
+
+struct GitHubRepositoryBuilder: GitHubRepositoryBuilderProtocol {
+    @MainActor func build() -> GitHubRepositoryView {
+        let view = GitHubRepositoryView(
+            viewModel: .init(
+                useCase: GitHubRepositoryUseCase(
+                    repository: GitHubRepository(
+                        dataStore: GitHubRepositoryDataStore(
+                            apiClient: APIClient()
+                        )
+                    ),
+                    translator: GitHubRepositoryTranslator()
+                )
+            )
+        )
+        return view
+    }
+}
+```
+
+* 起動
 
 ``` swift
 @main
 struct MyApp: App {
     var body: some Scene {
         WindowGroup {
-            let viewModel: GitHubRepositoryViewModel = {
-                let repository = GitHubRepository()
-                let useCase = GitHubRepositoryUseCase(repository: repository)
-                let viewModel = GitHubRepositoryViewModel(useCase: useCase)
-                return viewModel
-            }()
-
-            GitHubRepositoryView(viewModel: viewModel)
+            GitHubRepositoryBuilder().build()
         }
     }
 }
