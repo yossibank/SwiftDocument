@@ -192,7 +192,7 @@ final class SomeDataRepositoryGateway: SomeDataRepositoryProtocol {
 enum APIError: Error {
     case badURL
     case badRequest
-    case badDecode
+    case decodeError
     case unknown
 }
 
@@ -223,7 +223,7 @@ final class APIClient {
                 from: data
             ).items
         } catch {
-            throw APIError.badDecode
+            throw APIError.decodeError
         }
     }
 }
