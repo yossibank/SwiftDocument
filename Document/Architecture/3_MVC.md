@@ -4,7 +4,7 @@
 
 ## 概要
 
-**プログラムを「入力」「出力」「データの処理」の3つの要素に分けることで、アプリケーションの処理から入力と出力とを分離・独立させてプログラムの本質である「データ処理」そのものに専念しやすくするのを抽象化したアーキテクチャ**
+**プログラムを「入力」「出力」「データの処理」の3つの要素に分けることで、アプリケーションの処理から入力と出力とを分離・独立させてプログラムの本質である「データ処理」そのものに専念しやすくするのを抽象化したGUIアーキテクチャ**
 
 ### メリット
 
@@ -109,7 +109,7 @@ final class GitHubRepositoryModel: ObservableObject {
         do {
             let response = try await apiClient.fetch(query: query)
 
-            Task { @MainActor in
+            await MainActor.run {
                 repositories = response
             }
         } catch {
