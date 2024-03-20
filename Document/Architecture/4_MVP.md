@@ -168,6 +168,8 @@ final class GitHubRepositoryPresenter: ObservableObject {
 }
 ```
 
+### View
+
 ``` swift
 struct GitHubRepositoryView: View {
     @StateObject var presenter: GitHubRepositoryPresenter

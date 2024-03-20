@@ -152,6 +152,8 @@ final class GitHubRepositoryViewModel: ObservableObject {
 }
 ```
 
+### View
+
 ``` swift
 struct GitHubRepositoryView: View {
     @StateObject var viewModel: GitHubRepositoryViewModel
