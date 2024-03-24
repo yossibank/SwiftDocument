@@ -1,10 +1,7 @@
 ## 詳細概要
 - [詳細概要](#詳細概要)
-  - [2.CSR(証明書署名要求)作成](#2csr証明書署名要求作成)
-    - [CSR作成方法](#csr作成方法)
-  - [3.証明書作成](#3証明書作成)
-    - [証明書作成方法](#証明書作成方法)
   - [4.証明書登録](#4証明書登録)
+    - [Code Signing Identity](#code-signing-identity)
   - [5.AppID登録](#5appid登録)
     - [AppID作成方法](#appid作成方法)
   - [6.Device登録](#6device登録)
@@ -15,59 +12,10 @@
   - [9.ビルド設定](#9ビルド設定)
   - [10.ビルドとアーカイブ](#10ビルドとアーカイブ)
   - [11.豆知識(Tips)](#11豆知識tips)
-    - [Code Signing Identity](#code-signing-identity)
     - [証明書の管理](#証明書の管理)
       - [新しく証明書を作成するパターン](#新しく証明書を作成するパターン)
       - [既存の証明書を渡すパターン](#既存の証明書を渡すパターン)
 - [参考文献](#参考文献)
-
-### 2.CSR(証明書署名要求)作成
-
-CSRは証明書署名リクエストで、認証局(Apple)に自身の開発者情報を送るための事前準備になります。
-
-CSR作成時に秘密鍵・公開鍵のペアが作成され、ローカルマシン内のキーチェーンに保存されます。
-
-さらに、公開鍵は自身の開発者情報と共にCSRに含まれます。
-
-※ CSR → .certSigningRequestファイル形式で作成されます
-
-<img src="../../Image/Certificate/Certificate19.png" width="80%">
-
-#### CSR作成方法
-
-1. キーチェンアクセス → 証明書アシスタント → 認証局に証明書を要求
-
-<img src="../../Image/Certificate/Certificate20.png" width="80%">
-
-2. 証明書情報を入力、ローカルに保存
-
-<img src="../../Image/Certificate/Certificate21.png" width="80%">
-
-3. 鍵ペア情報入力(2048ビット、RSA選択)
-
-<img src="../../Image/Certificate/Certificate22.png" width="80%">
-
-### 3.証明書作成
-
-`2.CSR(証明書署名要求)作成`で準備したCSRに対して、認証局のデジタル署名を付与したものになります。いわゆる前述で紹介したデジタル証明書と同等のものになります。
-
-※ 証明書 → .cerファイル形式で作成されます
-
-<img src="../../Image/Certificate/Certificate23.png" width="80%">
-
-#### 証明書作成方法
-
-1. Certificates → ＋マーク → Create a New Certificate情報入力
-
-<img src="../../Image/Certificate/Certificate24.png" width="80%">
-
-2. 作成したCSRを選択
-
-<img src="../../Image/Certificate/Certificate25.png" width="80%">
-
-3. 作成された証明書をダウンロード
-
-<img src="../../Image/Certificate/Certificate26.png" width="80%">
 
 ### 4.証明書登録
 
@@ -82,6 +30,23 @@ CSR作成時に秘密鍵・公開鍵のペアが作成され、ローカルマ�
 <img src="../../Image/Certificate/Certificate28.png" width="80%">
 
 もし、証明書に対して秘密鍵が紐づかない場合は、`2.CSR(証明書署名要求)作成`の際に作成された秘密鍵がローカルマシンに存在していないことを意味します。
+
+#### Code Signing Identity
+
+証明書と秘密鍵が紐づいてペアとなったものは[identity](https://developer.apple.com/documentation/security/certificate_key_and_trust_services/identities)と呼ばれ、特にコード署名においてはCode Signing Identityと呼ばれます。
+
+`4.証明書登録`で証明書と秘密鍵が紐づかれると説明しましたが、これは署名を行う際に使用する証明書内の公開鍵とペアとなっている秘密鍵を特定するために行なっています。
+
+Code Signing Identityはp12というファイル形式でインポート・エクスポートすることができます。p12ファイルはコード署名に必要な公開鍵・秘密鍵、諸々の情報を含んでいるため、取り扱いには注意する必要があります。
+
+<img src="../../Image/Certificate/Certificate29.png" width="80%">
+
+p12ファイルは、例えばローカルマシンを買い替える時などに使えます。古いローカルマシンからp12ファイルをエクスポートし、新しいローカルマシンにインポートすれば、新しいローカルマシンで再度証明書の作成をする必要がなくなります。
+
+<img src="../../Image/Certificate/Certificate30.png" width="80%">
+
+他にもp12ファイルは、チーム開発する際に共有をしたり、BitriseといったCI/CDツールでコード署名を行うために必要だったりします。
+
 
 ### 5.AppID登録
 
@@ -199,22 +164,6 @@ ipaファイルには、コード署名で使用したプロビジョニング�
 このipaファイルが、DeployGateでの配信や、App Storeにリリースする際のアプリの情報の元になります。
 
 ### 11.豆知識(Tips)
-
-#### Code Signing Identity
-
-証明書と秘密鍵が紐づいてペアとなったものは[identity](https://developer.apple.com/documentation/security/certificate_key_and_trust_services/identities)と呼ばれ、特にコード署名においてはCode Signing Identityと呼ばれます。
-
-`4.証明書登録`で証明書と秘密鍵が紐づかれると説明しましたが、これは署名を行う際に使用する証明書内の公開鍵とペアとなっている秘密鍵を特定するために行なっています。
-
-Code Signing Identityはp12というファイル形式でインポート・エクスポートすることができます。p12ファイルはコード署名に必要な公開鍵・秘密鍵、諸々の情報を含んでいるため、取り扱いには注意する必要があります。
-
-<img src="../../Image/Certificate/Certificate29.png" width="80%">
-
-p12ファイルは、例えばローカルマシンを買い替える時などに使えます。古いローカルマシンからp12ファイルをエクスポートし、新しいローカルマシンにインポートすれば、新しいローカルマシンで再度証明書の作成をする必要がなくなります。
-
-<img src="../../Image/Certificate/Certificate30.png" width="80%">
-
-他にもp12ファイルは、チーム開発する際に共有をしたり、BitriseといったCI/CDツールでコード署名を行うために必要だったりします。
 
 #### 証明書の管理
 
